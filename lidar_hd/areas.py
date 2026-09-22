@@ -67,6 +67,39 @@ def search(level: Level, term: str, limit: int = 25) -> list[Area]:
     return areas
 
 
+def browse(level: Level) -> list[Area]:
+    """List regions or departments alphabetically, without fetching geometry.
+
+    Communes must be searched rather than bulk loaded.
+    """
+    if level == "commune":
+        return []
+    if level not in LEVELS:
+        raise ValueError(f"unknown administrative level: {level}")
+
+    count = 1000
+    url = wfs_url(level, count=count, properties="nom_officiel,code_insee")
+    areas = []
+    offset = 0
+    while True:
+        data = get_json(f"{url}&STARTINDEX={offset}&SORTBY=nom_officiel,code_insee")
+        features = data.get("features") or []
+        if not features:
+            break
+        for feat in features:
+            p = feat["properties"]
+            areas.append(Area(level, p.get("nom_officiel", "?"), p.get("code_insee", "?")))
+        offset += len(features)
+        matched = data.get("numberMatched")
+        if matched is not None and str(matched).isdigit():
+            if offset >= int(matched):
+                break
+        elif len(features) < count:
+            break
+    areas.sort(key=lambda a: (a.name.casefold(), a.code))
+    return areas
+
+
 def geometry(area: Area) -> dict:
     """Fetch an area's polygon in Lambert-93 (EPSG:2154)."""
     data = get_json(wfs_url(area.level, cql=f"code_insee='{area.code}'"))

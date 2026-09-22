@@ -9,7 +9,10 @@ from __future__ import annotations
 import argparse
 import sys
 import threading
+import time
 from pathlib import Path
+
+from rich.markup import escape
 
 sys.path.insert(0, str(Path(__file__).parent))
 
@@ -21,7 +24,7 @@ for _stream in (sys.stdout, sys.stderr):
     except (AttributeError, OSError):
         pass
 
-from lidar_hd import areas, pipeline                       # noqa: E402
+from lidar_hd import areas, jobs, pipeline                 # noqa: E402
 from lidar_hd.areas import Area, Level                     # noqa: E402
 from lidar_hd.catalog import Catalog                       # noqa: E402
 from lidar_hd.config import data_root, minio_config        # noqa: E402
@@ -29,8 +32,9 @@ from lidar_hd.config import data_root, minio_config        # noqa: E402
 from textual import on, work                              # noqa: E402
 from textual.app import App, ComposeResult                # noqa: E402
 from textual.containers import Horizontal, Vertical, VerticalScroll  # noqa: E402
+from textual.theme import Theme                           # noqa: E402
 from textual.widgets import (Button, Checkbox, DataTable, Footer, Header,  # noqa: E402
-                             Input, Label, Log, RadioButton, RadioSet, Static)
+                             Input, Label, Log, ProgressBar, RadioButton, RadioSet, Static)
 
 
 def bbox_of(tiles: list[tuple[int, int]]) -> tuple[float, float, float, float]:
@@ -39,22 +43,15 @@ def bbox_of(tiles: list[tuple[int, int]]) -> tuple[float, float, float, float]:
     return (min(xs) * 1000, (min(ys) - 1) * 1000, (max(xs) + 1) * 1000, max(ys) * 1000)
 
 
+class AreaTable(DataTable):
+    BINDINGS = [("space", "select_cursor", "Toggle selection")]
+
+
 class LidarApp(App):
-    CSS = """
-    Screen { layout: vertical; }
-    #top { height: auto; padding: 1 2; }
-    #search-row { height: 3; }
-    #term { width: 1fr; }
-    #results { height: 12; margin: 1 0; }
-    #summary { height: auto; padding: 1 2; background: $boost; }
-    #summary.ready { border-left: thick $success; }
-    #opts { height: auto; padding: 0 2; }
-    #actions { height: 3; padding: 0 2; }
-    #log { height: 1fr; margin: 1 2; border: round $primary; }
-    .dim { color: $text-muted; }
-    Button { margin-right: 1; }
-    """
-    BINDINGS = [("q", "quit", "Quit"), ("r", "run", "Run"), ("escape", "stop", "Stop")]
+    CSS_PATH = "lidar_hd/tui.tcss"
+    BINDINGS = [("ctrl+q", "quit", "Quit"), ("ctrl+r", "run", "Run"),
+                ("escape", "stop", "Stop"), ("slash", "search", "Search"),
+                ("ctrl+f", "search", "Search")]
 
     def __init__(self) -> None:
         super().__init__()
@@ -64,45 +61,103 @@ class LidarApp(App):
         self.tiles: list[tuple[int, int]] = []
         self.est: pipeline.Estimate | None = None
         self._stop = threading.Event()
+        self._run_lock = threading.Event()
+        self._search_generation = 0
+        self._estimate_generation = 0
+        self._search_timer = None
+        self._browse_cache: dict[Level, list[Area]] = {}
+        self._stages: list[str] = []
+        self._stage_fractions: dict[str, float] = {}
+        self._download_done = 0
+        self._transfer_started = 0.0
+        self._transfer_tile = ""
+        self._selection: dict[tuple[str, str], Area] = {}
+        self._prepared: dict[tuple[str, str], tuple[Area, list[tuple[int, int]]]] = {}
+        self._estimate_requests: dict[tuple[str, str], int] = {}
+        self._estimate_lock = threading.Lock()
+        self._batch_index = 0
+        self._batch_total = 1
+        self._batch_name = ""
+        self._download_total = 0
+        self.register_theme(Theme(
+            name="lidar-night", primary="#91d7c0", secondary="#c5afe8",
+            accent="#91d7c0", foreground="#d8dbe8", background="#1c1d27",
+            surface="#232530", panel="#232530", success="#91d7c0",
+            warning="#e5c38e", error="#ef9aa4", dark=True,
+        ))
+        self.theme = "lidar-night"
 
     # --- layout ------------------------------------------------------------
 
     def compose(self) -> ComposeResult:
-        yield Header(show_clock=True)
-        with Vertical(id="top"):
-            with RadioSet(id="level"):
-                yield RadioButton("Commune", value=True, id="commune")
-                yield RadioButton("Department", id="departement")
-                yield RadioButton("Region", id="region")
-            with Horizontal(id="search-row"):
-                yield Input(placeholder="Type a name, e.g. Pessac — then Enter",
-                            id="term")
-                yield Button("Search", id="search", variant="primary")
-        yield DataTable(id="results", cursor_type="row")
-        yield Static("Select an area to see an estimate.", id="summary")
-        with Horizontal(id="opts"):
-            yield Checkbox("Colourise (ortho RGB)", id="do_color")
-            yield Checkbox("Convert to 3D Tiles", id="do_tiles")
-            yield Checkbox("Upload to MinIO", id="do_upload")
-        with Horizontal(id="actions"):
-            yield Button("Run", id="run", variant="success", disabled=True)
-            yield Button("Stop", id="stop", variant="error", disabled=True)
-        yield Log(id="log", highlight=True)
+        yield Header()
+        with VerticalScroll(id="workspace"):
+            with Horizontal(id="top"):
+                with Vertical(id="navigation", classes="pane"):
+                    yield Label("EXPLORE", classes="eyebrow")
+                    with RadioSet(id="level"):
+                        yield RadioButton("Region", value=True, id="region")
+                        yield RadioButton("Department", id="departement")
+                        yield RadioButton("Commune", id="commune")
+                    yield Static("IGN LiDAR HD\nFrance · 1 km tiles", classes="dim", id="source-note")
+                    yield Static("↑ ↓  Browse\nSpace  Toggle\nEnter  Toggle\n/  Search\nTab  Next pane", classes="dim", id="key-guide")
+                with Vertical(id="browser", classes="pane"):
+                    with Horizontal(id="search-row"):
+                        yield Input(placeholder="Filter regions by name…", id="term")
+                        yield Button("Search", id="search")
+                    yield Static("Loading regions…", id="results-status", markup=False)
+                    yield AreaTable(id="results", cursor_type="row", zebra_stripes=True)
+                with Vertical(id="details", classes="pane"):
+                    with VerticalScroll(id="details-scroll"):
+                        yield Static("0 areas selected", id="selection-count")
+                        yield Static("Selections stay while you search.", id="selected-areas", markup=False)
+                        yield Button("Clear selection", id="clear-selection")
+                        yield Static("Choose an area\n\nSelect a place from the list to see its tile count and storage estimate.", id="summary")
+                        yield Label("PIPELINE", classes="eyebrow")
+                        yield Static("Unchecked stages reuse existing files.", classes="dim")
+                        with Vertical(id="opts"):
+                            yield Checkbox("Download LiDAR", id="do_download", value=True)
+                            yield Checkbox("Colourise (20 cm ortho)", id="do_color")
+                            yield Checkbox("Export ortho PMTiles", id="do_ortho")
+                            yield Checkbox("Convert to 3D Tiles", id="do_tiles")
+                            yield Checkbox("Upload to MinIO", id="do_upload")
+                            yield Checkbox("Clean intermediates", id="do_clean", value=True)
+                        yield Static("", id="upload-note", classes="dim")
+                    with Horizontal(id="actions"):
+                        yield Button("Run", id="run", variant="primary", disabled=True)
+                        yield Button("Stop", id="stop", disabled=True)
+            with Horizontal(id="progress-row"):
+                with Vertical(id="overall-pane", classes="pane"):
+                    yield Static("Ready · select an area", id="overall-label", markup=False)
+                    yield ProgressBar(total=100, show_eta=False, id="overall-progress")
+                    yield Static("Enabled stages, equally weighted; not elapsed time.", id="stage-label", classes="dim", markup=False)
+                with Vertical(id="download-pane", classes="pane"):
+                    yield Static("No active transfer", id="download-label", markup=False)
+                    yield ProgressBar(total=100, show_eta=False, id="download-progress")
+                    yield Static("Current file · bytes received", id="download-detail", classes="dim", markup=False)
+            yield Log(id="log", highlight=False, max_lines=1000)
         yield Footer()
 
     def on_mount(self) -> None:
         self.title = "LiDAR HD"
-        self.sub_title = "IGN Géoplateforme → COPC → 3D Tiles → MinIO"
+        self.sub_title = "Explore · download · build"
+        for selector, title in (("#navigation", "Area level"), ("#browser", "Places"),
+                                ("#details", "Selection"), ("#overall-pane", "Overall progress"),
+                                ("#download-pane", "Download"), ("#log", "Activity")):
+            self.query_one(selector).border_title = title
         table = self.query_one("#results", DataTable)
-        table.add_columns("Name", "Code", "Population")
+        table.add_columns("", "Place", "Code")
         self.query_one("#term", Input).focus()
 
         cfg = minio_config()
         if not cfg.configured:
             self.query_one("#do_upload", Checkbox).disabled = True
-            self.log_line("MinIO not configured — set MINIO_ENDPOINT / "
-                          "MINIO_ACCESS_KEY / MINIO_SECRET_KEY in .env to enable upload.")
+            self.query_one("#upload-note", Static).update("Upload unavailable: configure MinIO in .env.")
         self.log_line(f"Data directory: {data_root()}")
+        self.do_search()
+
+    def on_resize(self, event) -> None:
+        self.screen.set_class(event.size.width < 110, "narrow")
 
     def log_line(self, text: str) -> None:
         self.query_one("#log", Log).write_line(text)
@@ -114,152 +169,328 @@ class LidarApp(App):
         pressed = self.query_one("#level", RadioSet).pressed_button
         return (pressed.id if pressed else "commune")  # type: ignore[return-value]
 
+    def action_search(self) -> None:
+        if not self._run_lock.is_set():
+            self.query_one("#term", Input).focus()
+
+    def clear_selection(self, *, area_preview: bool = False) -> None:
+        # Textual calls this for text selection, including before widgets mount.
+        if not area_preview:
+            super().clear_selection()
+            return
+        self.selected, self.tiles, self.est = None, [], None
+        self.query_one("#summary", Static).update("Choose an area\n\nSelect a place to see its estimate.")
+        self.refresh_selection()
+
+    def refresh_selection(self) -> None:
+        count = len(self._selection)
+        pending = count - len(self._prepared)
+        suffix = f" · {pending} not ready" if pending else ""
+        self.query_one("#selection-count", Static).update(f"{count} areas selected{suffix}")
+        self.query_one("#selected-areas", Static).update(
+            " · ".join(a.name for a in self._selection.values()) or "Selections stay while you search.")
+        self.query_one("#run", Button).disabled = self._run_lock.is_set() or not count or bool(pending) or not self.options().stages
+        table = self.query_one("#results", DataTable)
+        for row, area in enumerate(self.found):
+            if row < table.row_count:
+                table.update_cell_at((row, 0), "[✓]" if (area.level, area.code) in self._selection else "[ ]")
+
+    @on(Button.Pressed, "#clear-selection")
+    def clear_queue(self) -> None:
+        if not self._run_lock.is_set():
+            self._selection.clear()
+            self._prepared.clear()
+            self._estimate_requests.clear()
+            self.clear_selection(area_preview=True)
+
+    @on(Checkbox.Changed)
+    def options_changed(self) -> None:
+        self.refresh_selection()
+
+    def options(self) -> jobs.Options:
+        return jobs.Options(**{stage: self.query_one(f"#do_{suffix}", Checkbox).value
+                               for stage, suffix in (("download", "download"), ("colorize", "color"),
+                                                     ("ortho", "ortho"), ("convert", "tiles"),
+                                                     ("upload", "upload"), ("cleanup", "clean"))})
+
+    @on(RadioSet.Changed, "#level")
+    def change_level(self) -> None:
+        if self._run_lock.is_set():
+            return
+        self.query_one("#term", Input).value = ""
+        self.query_one("#term", Input).placeholder = (
+            "Search communes, e.g. Pessac…" if self.level == "commune"
+            else f"Filter {areas.LEVELS[self.level].lower()}s by name…")
+        self.do_search()
+
+    @on(Input.Changed, "#term")
+    def filter_changed(self) -> None:
+        if self._run_lock.is_set():
+            return
+        self._search_generation += 1
+        self.clear_selection(area_preview=True)
+        self.found = []
+        self.query_one("#results", DataTable).clear()
+        if self._search_timer:
+            self._search_timer.stop()
+        self._search_timer = self.set_timer(0.35, self.do_search)
+
     @on(Button.Pressed, "#search")
     @on(Input.Submitted, "#term")
     def do_search(self) -> None:
-        term = self.query_one("#term", Input).value.strip()
-        if term:
-            self.search_worker(self.level, term)
-
-    @work(thread=True, exclusive=True)
-    def search_worker(self, level: Level, term: str) -> None:
-        self.call_from_thread(self.log_line, f"Searching {level} '{term}'…")
-        try:
-            found = areas.search(level, term)
-        except Exception as e:                       # noqa: BLE001
-            self.call_from_thread(self.log_line, f"Search failed: {e}")
+        if self._run_lock.is_set():
             return
-        self.call_from_thread(self.show_results, found)
+        if self._search_timer:
+            self._search_timer.stop()
+        self._search_generation += 1
+        generation = self._search_generation
+        self.clear_selection(area_preview=True)
+        term = self.query_one("#term", Input).value.strip()
+        self.found = []
+        self.query_one("#results", DataTable).clear()
+        if self.level == "commune" and not term:
+            self.query_one("#results-status", Static).update("Type a commune name to search. Regions and departments can be browsed directly.")
+            return
+        self.query_one("#results-status", Static).update("Loading places…")
+        if self.level in self._browse_cache:
+            self.show_results(self._browse_cache[self.level], generation, term)
+        else:
+            self.search_worker(self.level, term, generation)
 
-    def show_results(self, found: list[Area]) -> None:
+    @work(thread=True, exclusive=True, group="search")
+    def search_worker(self, level: Level, term: str, generation: int) -> None:
+        try:
+            found = areas.search(level, term) if level == "commune" else areas.browse(level)
+        except Exception as e:                       # noqa: BLE001
+            self.call_from_thread(self.search_failed, generation, str(e))
+            return
+        self.call_from_thread(self.show_results, found, generation, term, level)
+
+    def search_failed(self, generation: int, error: str) -> None:
+        if generation == self._search_generation:
+            self.query_one("#results-status", Static).update("Could not load places. Press Search to retry.")
+            self.log_line(f"Search failed: {error}")
+
+    def show_results(self, found: list[Area], generation: int, term: str = "",
+                     level: Level | None = None) -> None:
+        if generation != self._search_generation or self._run_lock.is_set():
+            return
+        if level and level != "commune":
+            self._browse_cache[level] = found
+        if self.level != "commune":
+            found = [a for a in found if term.casefold() in a.name.casefold() or term in a.code]
         self.found = found
         table = self.query_one("#results", DataTable)
         table.clear()
         for a in found:
-            table.add_row(a.name, a.code,
-                          f"{a.population:,}".replace(",", " ") if a.population else "—")
-        self.log_line(f"{len(found)} match(es).")
-        if found:
-            table.focus()
+            table.add_row("[✓]" if (a.level, a.code) in self._selection else "[ ]", a.name, a.code)
+        count = f"{len(found)} places" if len(found) != 25 or self.level != "commune" else "First 25 matches; refine your search"
+        self.query_one("#results-status", Static).update(
+            f"{count} · Tab to list, Space / Enter to toggle" if found
+            else "No places found. Try a different name.")
 
     @on(DataTable.RowSelected, "#results")
     def pick(self, event: DataTable.RowSelected) -> None:
-        if 0 <= event.cursor_row < len(self.found):
-            self.estimate_worker(self.found[event.cursor_row])
+        if not self._run_lock.is_set() and 0 <= event.cursor_row < len(self.found):
+            area = self.found[event.cursor_row]
+            key = (area.level, area.code)
+            if key in self._selection:
+                self._selection.pop(key)
+                self._prepared.pop(key, None)
+                self._estimate_requests.pop(key, None)
+                self.clear_selection(area_preview=True)
+                return
+            self._selection[key] = area
+            self._estimate_generation += 1
+            self._estimate_requests[key] = self._estimate_generation
+            self.refresh_selection()
+            self.query_one("#summary", Static).update(f"Measuring {escape(area.name)}…\n\nFetching boundary and counting tiles.")
+            self.estimate_worker(area, self._estimate_generation)
 
     # --- estimate ----------------------------------------------------------
 
-    @work(thread=True, exclusive=True)
-    def estimate_worker(self, area: Area) -> None:
+    @work(thread=True, group="estimate")
+    def estimate_worker(self, area: Area, generation: int) -> None:
         self.call_from_thread(self.log_line, f"Measuring {area.label}…")
         try:
-            geom = areas.geometry(area)
-            km2 = areas.area_km2(geom)
-            tiles = areas.tiles_for(geom)
+            with self._estimate_lock:
+                if self._estimate_requests.get((area.level, area.code)) != generation:
+                    return
+                geom = areas.geometry(area)
+                km2 = areas.area_km2(geom)
+                tiles = areas.tiles_for(geom)
         except Exception as e:                       # noqa: BLE001
-            self.call_from_thread(self.log_line, f"Failed: {e}")
+            self.call_from_thread(self.estimate_failed, area, generation, str(e))
             return
         est = pipeline.estimate(len(tiles))
-        self.call_from_thread(self.show_estimate, area, tiles, km2, est)
+        self.call_from_thread(self.show_estimate, area, tiles, km2, est, generation)
+
+    def estimate_failed(self, area: Area, generation: int, error: str) -> None:
+        key = (area.level, area.code)
+        if self._estimate_requests.get(key) == generation:
+            self.query_one("#summary", Static).update(f"Estimate unavailable for {escape(area.name)}.\nToggle the place off and on to retry.")
+            self.log_line(f"Estimate failed: {error}")
 
     def show_estimate(self, area: Area, tiles: list[tuple[int, int]],
-                      km2: float, est: pipeline.Estimate) -> None:
+                      km2: float, est: pipeline.Estimate, generation: int) -> None:
+        key = (area.level, area.code)
+        if self._estimate_requests.get(key) != generation or self._run_lock.is_set():
+            return
+        if tiles:
+            self._prepared[key] = (area, tiles)
         self.selected, self.tiles, self.est = area, tiles, est
         h = pipeline.human
         self.query_one("#summary", Static).update(
-            f"[b]{area.name}[/b] ({area.code}) · {km2:,.0f} km²\n".replace(",", " ")
+            f"[b]{escape(area.name)}[/b] ({area.code}) · {km2:,.0f} km²\n\n".replace(",", " ")
             + f"[b]{len(tiles):,}[/b] tiles ≈ [b]{h(est.raw_bytes)}[/b] raw "
               .replace(",", " ")
             + f"(±8%)\n"
-            + f"[dim]+ colourised {h(est.colorized_bytes)} "
-              f"+ 3D Tiles {h(est.tiles3d_bytes)} = {h(est.total_bytes)} if all stages run[/dim]\n"
+            + f"\n[dim]Colourised  {h(est.colorized_bytes)}\n"
+              f"3D Tiles    {h(est.tiles3d_bytes)}\n"
+              f"All LiDAR outputs  {h(est.total_bytes)}\n"
+              f"Ortho cache and PMTiles are additional.[/dim]\n\n"
             + f"[dim]~{est.download_hours:.1f} h download"
               f" · ~{est.process_hours:.1f} h processing[/dim]"
         )
-        self.query_one("#summary", Static).add_class("ready")
-        self.query_one("#run", Button).disabled = False
+        self.refresh_selection()
+        if not tiles:
+            self.query_one("#summary", Static).update("No LiDAR tiles intersect this area.")
         self.log_line(f"{area.name}: {len(tiles)} tiles, ~{h(est.raw_bytes)}")
 
     # --- run ---------------------------------------------------------------
 
     @on(Button.Pressed, "#run")
     def action_run(self) -> None:
-        if not self.selected or not self.tiles:
+        options = self.options()
+        if (self._run_lock.is_set() or not self._selection or not options.stages
+                or len(self._prepared) != len(self._selection)):
             return
+        self._run_lock.set()
         self._stop.clear()
+        self._stages = options.stages
+        self._batch_total = len(self._selection)
+        self._batch_index = 0
+        self.query_one("#overall-progress", ProgressBar).update(total=100, progress=0)
+        self.query_one("#download-progress", ProgressBar).update(total=100, progress=0)
+        self.query_one("#download-label", Static).update("Waiting for download" if options.download else "Download not selected")
+        self.query_one("#download-detail", Static).update("Current file · bytes received")
+        for selector in ("#level", "#term", "#search", "#results", "#opts", "#clear-selection"):
+            self.query_one(selector).disabled = True
         self.query_one("#run", Button).disabled = True
         self.query_one("#stop", Button).disabled = False
-        self.run_worker_thread(
-            self.selected, self.tiles,
-            self.query_one("#do_color", Checkbox).value,
-            self.query_one("#do_tiles", Checkbox).value,
-            self.query_one("#do_upload", Checkbox).value,
-        )
+        self.run_worker_thread([self._prepared[key] for key in self._selection], options)
 
     @on(Button.Pressed, "#stop")
     def action_stop(self) -> None:
+        if not self._run_lock.is_set():
+            return
         self._stop.set()
-        self.log_line("Stopping after the current tile…")
+        self.query_one("#stop", Button).disabled = True
+        self.query_one("#overall-label", Static).update("Stopping after the current operation…")
+        self.log_line("Stop requested. Waiting for the current tile or conversion; inputs will be kept.")
 
-    @work(thread=True, exclusive=True)
-    def run_worker_thread(self, area: Area, tiles: list[tuple[int, int]],
-                          do_color: bool, do_tiles: bool, do_upload: bool) -> None:
+    def action_quit(self) -> None:
+        if self._run_lock.is_set():
+            self.action_stop()
+            self.notify("Wait for Stopped, then quit again. Your inputs will be kept.")
+        else:
+            self.exit()
+
+    def begin_area(self, index: int, area: Area) -> None:
+        self._batch_index = index
+        self._batch_name = area.name
+        self._stage_fractions = dict.fromkeys(self._stages, 0.0)
+        self._download_done = 0
+        self._download_total = 0
+        self._transfer_tile = ""
+        self.query_one("#overall-label", Static).update(f"Area {index + 1}/{self._batch_total} · {area.name}")
+        self.query_one("#download-progress", ProgressBar).update(total=100, progress=0)
+
+    def refresh_overall(self) -> None:
+        fraction = sum(self._stage_fractions.values()) / max(1, len(self._stages))
+        percent = 100 * (self._batch_index + fraction) / self._batch_total
+        self.query_one("#overall-progress", ProgressBar).update(total=100, progress=percent)
+
+    def update_progress(self, stage: str, done: int, total: int, detail: str) -> None:
+        if stage not in self._stages:
+            return
+        fraction = min(1.0, max(0.0, done / total)) if total else 0.0
+        self._stage_fractions[stage] = max(self._stage_fractions.get(stage, 0.0), fraction)
+        if stage == "download":
+            self._download_done, self._download_total = done, total
+            if done and (detail.endswith(" present") or "not available" in detail or "FAILED" in detail):
+                self.query_one("#download-label", Static).update(detail)
+                self.query_one("#download-progress", ProgressBar).update(total=100, progress=100 if "present" in detail else 0)
+                self.query_one("#download-detail", Static).update("Already on disk" if "present" in detail else "No bytes transferred")
+        if not self._stop.is_set():
+            self.query_one("#overall-label", Static).update(
+                f"Area {self._batch_index + 1}/{self._batch_total} · {self._batch_name} · {stage}")
+        self.query_one("#stage-label", Static).update(f"{stage.capitalize()} {done}/{total} · {detail}")
+        self.refresh_overall()
+
+    def update_transfer(self, tile: str, received: int, total: int | None) -> None:
+        if tile != self._transfer_tile or received == 0:
+            self._transfer_tile = tile
+            self._transfer_started = time.monotonic()
+        elapsed = max(0.001, time.monotonic() - self._transfer_started)
+        speed = received / elapsed
+        self.query_one("#download-label", Static).update(tile)
+        bar = self.query_one("#download-progress", ProgressBar)
+        bar.update(total=total if total else None, progress=received)
+        h = pipeline.human
+        size = f"{h(received)} / {h(total)}" if total else f"{h(received)} · size unknown"
+        self.query_one("#download-detail", Static).update(f"{size} · {h(speed)}/s")
+        if total and self._download_total:
+            fraction = (self._download_done + min(received / total, 1)) / self._download_total
+            self._stage_fractions["download"] = max(self._stage_fractions.get("download", 0), min(fraction, 1))
+            self.refresh_overall()
+
+    @work(thread=True, exclusive=True, group="pipeline")
+    def run_worker_thread(self, batch: list[tuple[Area, list[tuple[int, int]]]],
+                          options: jobs.Options) -> None:
         log = lambda s: self.call_from_thread(self.log_line, s)    # noqa: E731
-        root = data_root() / f"{area.level}-{area.code}"
-        names = areas.tile_names(tiles)
 
         def progress(stage: str, done: int, total: int, detail: str) -> None:
+            self.call_from_thread(self.update_progress, stage, done, total, detail)
             if done % 10 == 0 or done == total or "FAIL" in detail:
                 log(f"[{stage} {done}/{total}] {detail}")
 
-        # Narrow the block list to those covering this area: turns tile
-        # resolution from ~25 s/tile into ~0.1 s/tile.
-        log(f"Resolving delivery blocks for {area.name}…")
-        self.catalog.fetch_blocks()
-        n = self.catalog.prioritise(bbox_of(tiles))
-        log(f"{n} block(s) cover this area.")
+        def transfer(tile: str, received: int, total: int | None) -> None:
+            self.call_from_thread(self.update_transfer, tile, received, total)
 
-        raw = root / "raw"
-        r = pipeline.download_tiles(names, raw, self.catalog,
-                                    progress, self._stop.is_set)
-        self.catalog.save(data_root() / "catalog.json")
-        log(f"Download: {r.ok} new, {r.skipped} present, {len(r.failed)} failed "
-            f"({pipeline.human(r.bytes_moved)} in {r.seconds / 60:.1f} min)")
+        failures = 0
+        try:
+            for index, (area, tiles) in enumerate(batch):
+                if self._stop.is_set():
+                    break
+                self.call_from_thread(self.begin_area, index, area)
+                log(f"Starting {area.label}")
+                try:
+                    results = jobs.run_area(area, tiles, data_root(), self.catalog, options,
+                                            progress, self._stop.is_set, transfer)
+                    failures += sum(len(result.failed) for result in results.values())
+                except InterruptedError:
+                    self._stop.set()
+                except Exception as e:               # noqa: BLE001
+                    failures += 1
+                    log(f"FAILED {area.name}: {e}")
+        finally:
+            self.call_from_thread(self._finish, failures)
 
-        source = raw
-        if do_color and not self._stop.is_set():
-            col = root / "colorized"
-            r = pipeline.colorize_all(raw, col, progress, self._stop.is_set)
-            log(f"Colourise: {r.ok} done, {r.skipped} present, {len(r.failed)} failed "
-                f"({r.seconds / 60:.1f} min)")
-            source = col
-
-        tiles3d = root / "3dtiles"
-        if do_tiles and not self._stop.is_set():
-            pattern = "*.laz" if source.name == "colorized" else "*.copc.laz"
-            inputs = sorted(source.glob(pattern))
-            r = pipeline.convert_3dtiles(inputs, tiles3d, progress=progress)
-            if r.failed:
-                log(f"Convert FAILED: {r.failed[0]}")
-            else:
-                log(f"Convert: {r.ok} tiles -> {pipeline.human(r.bytes_moved)} "
-                    f"({r.seconds / 60:.1f} min)")
-
-        if do_upload and not self._stop.is_set():
-            cfg = minio_config()
-            target = tiles3d if tiles3d.exists() else source
-            prefix = f"{cfg.prefix}/{area.level}-{area.code}"
-            log(f"Uploading {target.name} → {cfg.bucket}/{prefix}")
-            r = pipeline.upload_dir(target, prefix, cfg, progress, self._stop.is_set)
-            log(f"Upload: {r.ok} objects, {r.skipped} present, {len(r.failed)} failed "
-                f"({pipeline.human(r.bytes_moved)})")
-
-        log("Done." if not self._stop.is_set() else "Stopped.")
-        self.call_from_thread(self._finish)
-
-    def _finish(self) -> None:
-        self.query_one("#run", Button).disabled = False
+    def _finish(self, failures: int = 0) -> None:
+        self._run_lock.clear()
+        for selector in ("#level", "#term", "#search", "#results", "#opts", "#clear-selection"):
+            self.query_one(selector).disabled = False
+        self.refresh_selection()
         self.query_one("#stop", Button).disabled = True
+        status = "Stopped · inputs kept" if self._stop.is_set() else (
+            f"Finished with {failures} error(s) · see activity" if failures else "Complete · all selected areas")
+        self.query_one("#overall-label", Static).update(status)
+        if not failures and not self._stop.is_set():
+            self.query_one("#overall-progress", ProgressBar).update(total=100, progress=100)
+        if self.query_one("#download-progress", ProgressBar).total is None:
+            self.query_one("#download-progress", ProgressBar).update(total=100, progress=0)
+        self.log_line(status)
 
 
 # --- command line ----------------------------------------------------------
@@ -269,68 +500,64 @@ def cli(argv: list[str] | None = None) -> int:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--level", choices=["commune", "departement", "region"],
                     help="administrative level")
-    ap.add_argument("--name", help="area name (exact or prefix)")
+    ap.add_argument("--name", action="append", help="area name (exact or prefix); repeat for a batch")
     ap.add_argument("--estimate-only", action="store_true",
                     help="print the estimate and exit")
     ap.add_argument("--color", action="store_true", help="colourise after download")
+    ap.add_argument("--ortho", action="store_true", help="export 20 cm orthophoto as raster PMTiles")
+    ap.add_argument("--no-download", action="store_true", help="reuse local inputs instead of downloading LiDAR")
     ap.add_argument("--tiles", action="store_true", help="convert to 3D Tiles")
     ap.add_argument("--upload", action="store_true", help="upload to MinIO")
+    ap.add_argument("--no-clean", action="store_true",
+                    help="keep raw/ and colorized/ after a successful run")
     args = ap.parse_args(argv)
 
     if not args.level or not args.name:
         LidarApp().run()
         return 0
 
-    found = areas.search(args.level, args.name)
-    if not found:
-        print(f"No {args.level} matching '{args.name}'")
-        return 1
-
-    area = found[0]
-    geom = areas.geometry(area)
-    tiles = areas.tiles_for(geom)
-    est = pipeline.estimate(len(tiles))
-    h = pipeline.human
-    print(f"{area.label}  {areas.area_km2(geom):,.0f} km²".replace(",", " "))
-    print(f"  {len(tiles):,} tiles ≈ {h(est.raw_bytes)} raw (±8%)".replace(",", " "))
-    print(f"  all stages: {h(est.total_bytes)}")
-    print(f"  ~{est.download_hours:.1f} h download, ~{est.process_hours:.1f} h processing")
-    if args.estimate_only:
-        return 0
-
-    root = data_root() / f"{area.level}-{area.code}"
     catalog = Catalog.load(data_root() / "catalog.json")
-    catalog.fetch_blocks()
-    catalog.prioritise(bbox_of(tiles))
+    options = jobs.Options(download=not args.no_download, colorize=args.color,
+                           ortho=args.ortho, convert=args.tiles, upload=args.upload,
+                           cleanup=not args.no_clean)
 
     def progress(stage: str, done: int, total: int, detail: str) -> None:
         print(f"[{stage} {done}/{total}] {detail}", flush=True)
 
-    r = pipeline.download_tiles(areas.tile_names(tiles), root / "raw",
-                                catalog, progress)
-    catalog.save(data_root() / "catalog.json")
-    print(f"Download: {r.ok} new, {r.skipped} present, {len(r.failed)} failed")
-
-    source = root / "raw"
-    if args.color:
-        r = pipeline.colorize_all(source, root / "colorized", progress)
-        print(f"Colourise: {r.ok} done, {len(r.failed)} failed")
-        source = root / "colorized"
-    if args.tiles:
-        pattern = "*.laz" if source.name == "colorized" else "*.copc.laz"
-        r = pipeline.convert_3dtiles(sorted(source.glob(pattern)),
-                                     root / "3dtiles", progress=progress)
-        print(f"Convert: {'failed: ' + r.failed[0] if r.failed else 'ok'}")
-    if args.upload:
-        cfg = minio_config()
-        if not cfg.configured:
-            print("MinIO not configured (see .env.example)")
-            return 1
-        target = root / "3dtiles" if (root / "3dtiles").exists() else source
-        r = pipeline.upload_dir(target, f"{cfg.prefix}/{area.level}-{area.code}",
-                                cfg, progress)
-        print(f"Upload: {r.ok} objects, {len(r.failed)} failed")
-    return 0
+    failed = False
+    seen = set()
+    for name in args.name:
+        try:
+            found = areas.search(args.level, name)
+            if not found:
+                print(f"No {args.level} matching '{name}'")
+                failed = True
+                continue
+            area = found[0]
+            if area.code in seen:
+                continue
+            seen.add(area.code)
+            geom = areas.geometry(area)
+            tiles = areas.tiles_for(geom)
+            est = pipeline.estimate(len(tiles))
+            h = pipeline.human
+            print(f"{area.label}  {areas.area_km2(geom):,.0f} km²".replace(",", " "))
+            print(f"  {len(tiles):,} tiles ≈ {h(est.raw_bytes)} raw (±8%)".replace(",", " "))
+            print(f"  all LiDAR outputs: {h(est.total_bytes)}; ortho cache/PMTiles additional")
+            print(f"  ~{est.download_hours:.1f} h download, ~{est.process_hours:.1f} h processing")
+            if args.estimate_only:
+                continue
+            if not tiles:
+                raise ValueError("No tiles intersect this area")
+            results = jobs.run_area(area, tiles, data_root(), catalog, options, progress)
+            failed |= any(result.failed for result in results.values())
+        except KeyboardInterrupt:
+            print("Stopped. Inputs kept.")
+            return 130
+        except Exception as e:                       # noqa: BLE001
+            print(f"FAILED {name}: {e}")
+            failed = True
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":

@@ -13,4 +13,6 @@ dependencies = [
     "textual>=8",
     "minio>=7.2",
     "python-dotenv>=1.0",
+    "rasterio>=1.5.1",
+    "pmtiles>=3.8.1",
 ]

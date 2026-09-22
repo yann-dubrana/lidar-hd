@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LiDAR HD Viewer</title>
+<style>
+  :root {
+    --bg: #0d1014;
+    --panel: rgba(18, 23, 30, 0.93);
+    --border: rgba(255, 255, 255, 0.1);
+    --text: #e9edf2;
+    --muted: #8d9bab;
+    --accent: #5ac8fa;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg);
+    color: var(--text);
+    font: 13px/1.45 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  #map { position: absolute; inset: 0; }
+
+  #panel {
+    position: absolute; top: 12px; left: 12px; width: 258px; z-index: 10;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    backdrop-filter: blur(12px); padding: 14px 15px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, .5);
+  }
+  h1 { margin: 0 0 2px; font-size: 14px; font-weight: 600; }
+  .sub { color: var(--muted); font-size: 11px; margin-bottom: 12px; }
+  .row { display: flex; align-items: center; justify-content: space-between;
+    margin: 9px 0; gap: 8px; }
+  label { color: var(--muted); font-size: 12px; }
+  select, button {
+    background: #1a2028; color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px 8px; font-size: 12px; font-family: inherit;
+  }
+  select { flex: 1; }
+  button { cursor: pointer; width: 100%; }
+  button:hover { border-color: var(--accent); color: var(--accent); }
+  input[type=range] { width: 108px; accent-color: var(--accent); }
+  .val { color: var(--text); font-variant-numeric: tabular-nums;
+    min-width: 32px; text-align: right; font-size: 11px; }
+  hr { border: 0; border-top: 1px solid var(--border); margin: 12px 0; }
+  #stats { color: var(--muted); font-size: 11px; line-height: 1.75; }
+  #stats b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+  #legend { margin-top: 9px; display: none; }
+  #legend div { display: flex; align-items: center; gap: 7px; margin: 3px 0;
+    font-size: 11px; color: var(--muted); }
+  #legend i { width: 11px; height: 11px; border-radius: 2px; }
+  #err { position: absolute; bottom: 12px; left: 12px; right: 12px; z-index: 20;
+    background: #42202a; border: 1px solid #7c3545; color: #ffd8df;
+    padding: 10px 12px; border-radius: 8px; display: none; font-size: 12px; }
+  #hint { position: absolute; bottom: 12px; right: 12px; z-index: 10;
+    color: var(--muted); font-size: 11px; background: var(--panel);
+    border: 1px solid var(--border); border-radius: 8px; padding: 7px 11px; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+
+<div id="panel">
+  <h1>LiDAR HD</h1>
+  <div class="sub" id="area">loading tileset…</div>
+
+  <div class="row">
+    <label for="mode">Colour</label>
+    <select id="mode">
+      <option value="rgb">Orthophoto RGB</option>
+      <option value="elev">Elevation</option>
+      <option value="class">Classification</option>
+    </select>
+  </div>
+
+  <div class="row">
+    <label for="size">Point size</label>
+    <input type="range" id="size" min="0.5" max="6" step="0.5" value="1.5">
+    <span class="val" id="sizeV">1.5</span>
+  </div>
+
+  <div class="row">
+    <label for="sse">Detail</label>
+    <input type="range" id="sse" min="1" max="12" step="1" value="1">
+    <span class="val" id="sseV">1</span>
+  </div>
+
+  <hr>
+  <button id="home">Reset view</button>
+  <hr>
+  <div id="stats">
+    <div>Points <b id="sPts">0</b></div>
+    <div>Tiles visible <b id="sVis">0</b></div>
+    <div>Loaded <b id="sLoaded">0</b></div>
+  </div>
+  <div id="legend"></div>
+</div>
+
+<div id="hint">drag rotate · scroll zoom · shift+drag pan</div>
+<div id="err"></div>
+
+<script src="https://unpkg.com/deck.gl@9.4.0/dist.min.js"></script>
+<script src="https://unpkg.com/@loaders.gl/core@4.5.2/dist/dist.min.js"></script>
+<script src="https://unpkg.com/@loaders.gl/3d-tiles@4.5.2/dist/dist.min.js"></script>
+<script>
+const TILESET = new URLSearchParams(location.search).get("url")
+             || "3dtiles/tileset.json";
+
+const fail = (m) => {
+  const e = document.getElementById("err");
+  e.style.display = "block";
+  e.textContent = m;
+  console.error(m);
+};
+
+// deck.gl and loaders.gl both publish UMD globals; the exact spelling has
+// moved between versions, so resolve defensively rather than assume.
+const DECK = window.deck || {};
+const Tile3DLayer = DECK.Tile3DLayer;
+const Tiles3DLoader = (window.loaders && (window.loaders.Tiles3DLoader
+                    || window.loaders.CesiumIonLoader)) || null;
+
+if (!Tile3DLayer) fail("deck.gl failed to load (no Tile3DLayer global).");
+if (!Tiles3DLoader) fail("@loaders.gl/3d-tiles failed to load (no Tiles3DLoader).");
+
+const CLASSES = [
+  [2, [139, 119, 101], "Ground"],
+  [3, [120, 160, 80], "Low vegetation"],
+  [4, [70, 140, 60], "Medium vegetation"],
+  [5, [35, 105, 45], "High vegetation"],
+  [6, [200, 90, 70], "Building"],
+  [9, [70, 130, 180], "Water"],
+  [17, [176, 160, 112], "Bridge"],
+  [1, [150, 150, 150], "Unclassified"],
+];
+
+// "Detail" in the UI runs 1..12 with higher = more detail, but deck.gl wants a
+// screen-space-error budget where LOWER means more refinement, so invert it.
+// Detail 1 -> SSE 16 (coarse), detail 8 -> SSE 2, detail 12 -> SSE ~1.3.
+const detailToSSE = (d) => 16 / d;
+const DEFAULT_DETAIL = 1;   // SSE 16: the value observed to refine correctly
+
+let state = {
+  mode: "rgb",
+  pointSize: 1.5,
+  detail: DEFAULT_DETAIL,
+  zMin: 0,
+  zMax: 100,
+  stats: { points: 0, visible: 0, loaded: 0 },
+};
+
+// Replaced by the tileset's own centre and zoom once it loads; these values
+// only cover the moment before that.
+let initialView = {
+  longitude: -0.71, latitude: 44.83, zoom: 12,
+  pitch: 45, bearing: 0, maxPitch: 85,
+};
+let homeView = { ...initialView };
+// Tiny transient offset used to force deck.gl to diff the layer; see render().
+let nudge = 0;
+
+// The camera is controlled rather than left to initialViewState: deck.gl only
+// reads initialViewState once, so a later change (such as framing the tileset
+// after it loads) would otherwise be ignored.
+const deckgl = new DECK.DeckGL({
+  container: document.getElementById("map"),
+  viewState: initialView,
+  onViewStateChange: ({ viewState }) => {
+    initialView = viewState;
+    deckgl.setProps({ viewState: initialView });
+  },
+  controller: { inertia: 250, dragRotate: true },
+  parameters: { clearColor: [0.05, 0.063, 0.078, 1] },
+  layers: [],
+});
+
+// Elevation ramp: blue -> green -> yellow -> white, by height.
+function rampColor(z) {
+  const t = Math.max(0, Math.min(1, (z - state.zMin) / Math.max(1, state.zMax - state.zMin)));
+  // Deep blue (low ground) -> teal -> green -> amber -> white (rooftops).
+  // Weighted toward the lower half, where most points sit.
+  const stops = [
+    [0.0, [30, 60, 120]], [0.18, [40, 120, 140]],
+    [0.40, [70, 150, 90]], [0.62, [190, 180, 80]],
+    [0.82, [215, 130, 65]], [1.0, [248, 246, 240]],
+  ];
+  for (let i = 0; i < stops.length - 1; i++) {
+    const [a, ca] = stops[i], [b, cb] = stops[i + 1];
+    if (t >= a && t <= b) {
+      const f = (t - a) / (b - a);
+      return [
+        Math.round(ca[0] + (cb[0] - ca[0]) * f),
+        Math.round(ca[1] + (cb[1] - ca[1]) * f),
+        Math.round(ca[2] + (cb[2] - ca[2]) * f),
+      ];
+    }
+  }
+  return [255, 255, 255];
+}
+
+// Component types a .pnts batch table can declare, mapped to the typed array
+// that reads them. Only the scalar cases we actually emit are covered.
+const COMPONENT_TYPES = {
+  UNSIGNED_BYTE: Uint8Array, BYTE: Int8Array,
+  UNSIGNED_SHORT: Uint16Array, SHORT: Int16Array,
+  UNSIGNED_INT: Uint32Array, INT: Int32Array,
+  FLOAT: Float32Array, DOUBLE: Float64Array,
+};
+
+// Pull one binary batch-table property out of a loaded tile. loaders.gl hands
+// back batchTableBinary as raw bytes and leaves decoding to the caller.
+function readBatchProperty(content, name, count) {
+  const json = content.batchTableJson;
+  const bin = content.batchTableBinary;
+  if (!json || !bin) return null;
+
+  const prop = json[name];
+  if (!prop) return null;
+  // A property can also be stored inline in the JSON as a plain array.
+  if (Array.isArray(prop)) return prop;
+
+  const Type = COMPONENT_TYPES[prop.componentType];
+  if (!Type || prop.type !== "SCALAR") return null;
+
+  const offset = (bin.byteOffset || 0) + (prop.byteOffset || 0);
+  try {
+    return new Type(bin.buffer, offset, count);
+  } catch (e) {
+    return null;                    // misaligned or short buffer: skip colour
+  }
+}
+
+// Widen the elevation ramp to the real z range as tiles arrive. Tile
+// positions are local to each tile's origin, so compare against the tile's
+// own centre height rather than raw values.
+let heightSeen = false;
+function sampleHeights(tile) {
+  const c = tile.content;
+  const posAttr = c && c.attributes && c.attributes.positions;
+  if (!posAttr) return;
+  const pos = posAttr.value || posAttr;
+  const base = (c.cartographicOrigin && c.cartographicOrigin[2]) || 0;
+
+  let lo = Infinity, hi = -Infinity;
+  const stride = Math.max(3, Math.floor(pos.length / 3 / 500) * 3);  // ~500 samples
+  for (let i = 2; i < pos.length; i += stride) {
+    const z = pos[i] + base;
+    if (z < lo) lo = z;
+    if (z > hi) hi = z;
+  }
+  if (!isFinite(lo)) return;
+
+  // Ignore tiles whose origin puts them far off the local terrain: deep leaves
+  // carry ECEF-derived origins that would blow the ramp out to +/-1 km.
+  if (hi - lo > 2000) return;
+
+  if (!heightSeen) {
+    state.zMin = lo; state.zMax = hi; heightSeen = true;
+  } else {
+    // Track a robust range rather than absolute extremes, so one outlying
+    // tile does not flatten the ramp for everything else.
+    state.zMin = Math.min(state.zMin, lo);
+    state.zMax = Math.max(state.zMax, hi);
+    if (state.zMax - state.zMin > 400) {
+      state.zMin = Math.max(state.zMin, state.zMax - 400);
+    }
+  }
+}
+
+// Per-tile colour override. deck.gl hands us the decoded tile content, so we
+// build a colour array once per tile rather than per frame.
+function recolor(tile) {
+  const c = tile.content;
+  if (!c || !c.attributes || !c.attributes.positions) return;
+  const n = c.pointCount || (c.attributes.positions.value.length / 3);
+
+  if (state.mode === "rgb") {
+    c.attributes.colors = c._originalColors || c.attributes.colors;
+    return;
+  }
+  if (!c._originalColors && c.attributes.colors) {
+    c._originalColors = c.attributes.colors;       // keep RGB for switching back
+  }
+
+  // .pnts attributes come back either as a bare typed array or as {value},
+  // depending on the field, so accept both shapes.
+  const pos = c.attributes.positions.value || c.attributes.positions;
+
+  // py3dtiles writes --extra-fields into the .pnts BATCH table. loaders.gl
+  // exposes that table as raw bytes (batchTableBinary) plus its JSON layout,
+  // and does not decode binary properties itself, so slice it out here.
+  const cls = readBatchProperty(c, "classification", n);
+
+  // Tile positions are relative to the tile's own origin.
+  const zBase = (c.cartographicOrigin && c.cartographicOrigin[2]) || 0;
+
+  // Match the stride the tile already uses (.pnts RGB is size 3).
+  const size = (c._originalColors && c._originalColors.size) || 3;
+  const out = new Uint8Array(n * size);
+
+  const lut = {};
+  for (const [id, col] of CLASSES) lut[id] = col;
+
+  for (let i = 0; i < n; i++) {
+    let col;
+    if (state.mode === "class") {
+      col = (cls && lut[cls[i]]) || [130, 136, 144];
+    } else {
+      col = rampColor(pos[i * 3 + 2] + zBase);   // absolute height, as sampled
+    }
+    out[i * size] = col[0];
+    out[i * size + 1] = col[1];
+    out[i * size + 2] = col[2];
+    if (size === 4) out[i * size + 3] = 255;
+  }
+  c.attributes.colors = { value: out, size, normalized: true };
+}
+
+function buildLayer() {
+  // Same id + same data means deck.gl updates this layer in place rather than
+  // tearing the tileset down and refetching it on every control change.
+  return new Tile3DLayer({
+    id: "lidar",
+    data: TILESET,
+    loader: Tiles3DLoader,
+    pointSize: state.pointSize + nudge,
+    maximumScreenSpaceError: detailToSSE(state.detail),
+    onTilesetLoad: (tileset) => {
+      const { cartographicCenter, zoom } = tileset;
+      if (cartographicCenter) {
+        // Use the tileset's own zoom: it is derived from the actual bounding
+        // volume, so it frames the data instead of guessing at a scale.
+        // The tileset's own `zoom` frames its bounding sphere, which for a
+        // wide block sits much too far out to see anything. Clamp it to a
+        // range where points are actually legible.
+        initialView = {
+          ...initialView,
+          longitude: cartographicCenter[0],
+          latitude: cartographicCenter[1],
+          // Close enough that the octree has refined to visible detail by the
+          // time the first frames land; the tileset's own zoom frames the
+          // whole block and shows almost nothing.
+          zoom: 16,
+          pitch: 45,
+        };
+        homeView = { ...initialView };        // what "Reset view" returns to
+        deckgl.setProps({ viewState: initialView });
+        document.getElementById("area").textContent =
+          `${cartographicCenter[1].toFixed(4)}°N, ${cartographicCenter[0].toFixed(4)}°E`;
+      }
+      // The root bounding volume is in ECEF, so its half-axes say nothing
+      // useful about terrain height. Sample real z from the first tiles that
+      // arrive instead (see sampleHeights below).
+      state.stats.points = tileset.stats?.get("Points")?.count ?? 0;
+    },
+    onTileLoad: (tile) => {
+      sampleHeights(tile);
+      recolor(tile);
+      state.stats.loaded++;
+      refreshStats();
+    },
+    onTileError: (tile, message) => fail("tile error: " + message),
+    pickable: false,
+  });
+}
+
+function render(opts) {
+  nudge = (opts && opts.pointSizeNudge) || 0;
+  deckgl.setProps({ layers: [buildLayer()] });
+  // A rebuilt descriptor does not always push maximumScreenSpaceError into the
+  // tileset that is already streaming, so set it on the live instance too.
+  const live = deckgl.layerManager?.layers?.find((l) => l.id.startsWith("lidar"));
+  const ts = live && live.state && live.state.tileset3d;
+  if (ts && ts.options) {
+    ts.options.maximumScreenSpaceError = detailToSSE(state.detail);
+  }
+}
+
+// deckgl.props.layers holds the layer *descriptors*; the instance that owns
+// the tileset lives in the layer manager, so read stats from there.
+function liveTileset() {
+  const live = deckgl.layerManager?.layers?.find((l) => l.id.startsWith("lidar"));
+  return (live && live.state && live.state.tileset3d) || null;
+}
+
+function refreshStats() {
+  const ts = liveTileset();
+  if (!ts) return;
+  const sel = ts.selectedTiles || [];
+  const pts = sel.reduce((a, t) => a + (t.content?.pointCount || 0), 0);
+  document.getElementById("sPts").textContent = pts.toLocaleString();
+  document.getElementById("sVis").textContent = sel.length;
+  document.getElementById("sLoaded").textContent =
+    ts.stats?.get("Tiles Loaded")?.count ?? state.stats.loaded;
+}
+
+// --- controls -------------------------------------------------------------
+document.getElementById("mode").onchange = (e) => {
+  state.mode = e.target.value;
+  const legend = document.getElementById("legend");
+  if (state.mode === "class") {
+    legend.style.display = "block";
+    legend.innerHTML = CLASSES.map(([, c, n]) =>
+      `<div><i style="background:rgb(${c.join(",")})"></i>${n}</div>`).join("");
+  } else {
+    legend.style.display = "none";
+  }
+  // Re-colour the tiles already in memory and redraw. Deliberately does NOT
+  // call render(): rebuilding the layer would tear down the live tileset and
+  // restart streaming from scratch.
+  // Re-colour what is already in memory. Deliberately does NOT call render():
+  // rebuilding the layer tears down the tileset and restarts streaming from
+  // scratch, which costs ~a minute on a deep octree. Instead mutate each
+  // tile's colour buffer and let deck re-upload it on the next draw.
+  const ts = liveTileset();
+  if (!ts) return;
+  for (const t of ts.tiles) if (t.content) recolor(t);
+
+  // Tile3DLayer caches each tile's mesh in its sub-layer's `data` object and
+  // reuses it on update, so the mutated colours must be written there too --
+  // otherwise the old COLOR_0 buffer keeps being drawn.
+  // Tile3DLayer caches one sub-layer per tile in state.layerMap and rebuilds an
+  // entry only when its `needsUpdate` flag is set -- which is exactly what the
+  // layer does to itself when its own props change. Setting the flag and asking
+  // for an update makes it re-read the mutated colours, without recreating the
+  // tileset and restarting the stream.
+  const live = deckgl.layerManager?.layers?.find((l) => l.id.startsWith("lidar"));
+  const map = live && live.state && live.state.layerMap;
+  if (map) for (const key of Object.keys(map)) map[key].needsUpdate = true;
+
+  // Marking layerMap alone is not enough: deck.gl consumes the flag but does
+  // not always re-upload the attribute. Pushing a genuinely changed prop makes
+  // it diff the layer and rebuild the sub-layers from the new colours. The
+  // nudge is imperceptible and is reverted on the next frame.
+  render({ pointSizeNudge: 0.001 });
+  requestAnimationFrame(() => render());
+};
+
+document.getElementById("size").oninput = (e) => {
+  state.pointSize = Number(e.target.value);
+  document.getElementById("sizeV").textContent = e.target.value;
+  render();
+};
+
+document.getElementById("sse").oninput = (e) => {
+  state.detail = Number(e.target.value);
+  document.getElementById("sseV").textContent = e.target.value;
+  render();
+};
+
+document.getElementById("home").onclick = () => {
+  initialView = { ...homeView };
+  deckgl.setProps({ viewState: { ...initialView, transitionDuration: 600 } });
+};
+
+render();
+setInterval(refreshStats, 600);
+</script>
+</body>
+</html>

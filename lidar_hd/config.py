@@ -83,5 +83,13 @@ def minio_config() -> MinioConfig:
 
 
 def data_root() -> Path:
-    """Where downloads and derived data land."""
-    return Path(os.getenv("LIDARHD_DATA", r"C:\lidar\data"))
+    """Where downloads and derived data land.
+
+    Defaults to a `data/` directory beside the project so the app keeps working
+    wherever it is checked out; override with LIDARHD_DATA to put the (large)
+    output on another drive.
+    """
+    env = os.getenv("LIDARHD_DATA")
+    if env:
+        return Path(env)
+    return Path(__file__).resolve().parent.parent / "data"

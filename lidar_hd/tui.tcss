@@ -1,0 +1,66 @@
+Screen {
+    background: $background;
+    color: $text;
+}
+Header { background: $surface; color: $secondary; }
+Footer { background: $surface; }
+#workspace { padding: 1 2; }
+#top { height: 1fr; min-height: 26; }
+.pane {
+    border: round #55596f;
+    border-title-color: $secondary;
+    background: $surface;
+    padding: 1 2;
+}
+.pane:focus-within { border: round $primary; border-title-color: $primary; }
+#navigation { width: 23; margin-right: 1; }
+#level { border: none; padding: 0; height: auto; background: transparent; }
+RadioButton { padding: 1 0; background: transparent; }
+#source-note { margin-top: 2; }
+#key-guide { margin-top: 2; }
+.eyebrow { color: $secondary; text-style: bold; margin-bottom: 1; }
+.dim { color: #a3a7bc; }
+#browser { width: 1fr; min-width: 30; margin-right: 1; }
+#search-row { height: 3; }
+#term { width: 1fr; background: $background; border: tall #55596f; }
+#term:focus { border: tall $primary; }
+#search { min-width: 8; width: 8; margin-left: 1; }
+#results-status { height: auto; min-height: 2; margin: 1 0; color: #a3a7bc; }
+#results { height: 1fr; background: $surface; }
+DataTable > .datatable--header { color: $secondary; background: $surface; text-style: bold; }
+DataTable > .datatable--cursor { color: #1c1d27; background: $primary; }
+DataTable > .datatable--odd-row { background: #282a37; }
+#details { width: 47; }
+#details-scroll { height: 1fr; }
+#summary { height: auto; margin-bottom: 1; }
+#selection-count { color: $primary; margin-bottom: 1; }
+#selected-areas { height: auto; max-height: 5; margin-bottom: 1; color: #a3a7bc; }
+#clear-selection { margin-bottom: 1; height: 3; }
+#opts { height: auto; margin: 1 0; }
+Checkbox { background: transparent; border: none; padding: 0; margin-bottom: 1; }
+Checkbox:focus { background: #343747; }
+#upload-note { height: auto; }
+#actions { height: 3; margin-top: 1; }
+#actions Button { width: 1fr; min-width: 8; }
+#run { margin-right: 1; }
+Button { background: #343747; border: none; }
+Button:focus { text-style: bold reverse; }
+Button.-primary { background: $primary; color: #1c1d27; }
+#progress-row { height: 9; margin-top: 1; }
+#overall-pane { width: 1fr; margin-right: 1; }
+#download-pane { width: 1fr; }
+ProgressBar { width: 1fr; margin: 1 0; }
+ProgressBar Bar { width: 1fr; }
+ProgressBar PercentageStatus { width: 6; }
+#stage-label, #download-detail { height: 2; }
+#log { height: 7; margin-top: 1; padding: 0 1; border: round #55596f; border-title-color: $secondary; background: $background; }
+Screen.narrow #top { layout: vertical; height: auto; }
+Screen.narrow #navigation { width: 1fr; height: 9; margin: 0 0 1 0; }
+Screen.narrow #level { layout: horizontal; }
+Screen.narrow RadioButton { padding: 0 1; }
+Screen.narrow #source-note, Screen.narrow #key-guide { display: none; }
+Screen.narrow #browser { width: 1fr; height: 20; margin: 0 0 1 0; }
+Screen.narrow #details { width: 1fr; height: 32; }
+Screen.narrow #progress-row { layout: vertical; height: 18; }
+Screen.narrow #overall-pane { width: 1fr; height: 9; margin: 0 0 1 0; }
+Screen.narrow #download-pane { width: 1fr; height: 9; }

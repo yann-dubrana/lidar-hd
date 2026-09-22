@@ -5,6 +5,7 @@ interrupted job continues where it stopped rather than starting over.
 """
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 import sys
@@ -76,14 +77,19 @@ class StageResult:
 
 def download_tiles(tiles: list[str], dest: Path, catalog: Catalog,
                    progress: Progress = _noop,
-                   should_stop: Callable[[], bool] = lambda: False) -> StageResult:
+                   should_stop: Callable[[], bool] = lambda: False, *,
+                   transfer_progress: Callable[[str, int, int | None], None] | None = None,
+                   ) -> StageResult:
     """Download tiles into `dest`, skipping any already present at full size.
 
     Sequential by design: IGN rate-limits concurrent requests.
+    `transfer_progress(tile, received, total)` reports per-attempt byte counts;
+    present files report their actual size as both received and total.
     """
     dest.mkdir(parents=True, exist_ok=True)
     res = StageResult()
     t0 = time.time()
+    progress("download", 0, len(tiles), "Resolving tiles")
 
     for i, tile in enumerate(tiles, 1):
         if should_stop():
@@ -99,11 +105,18 @@ def download_tiles(tiles: list[str], dest: Path, catalog: Catalog,
         want = entry.get("bytes") or 0
         if out.exists() and (out.stat().st_size == want or not want):
             res.skipped += 1
+            if transfer_progress:
+                size = out.stat().st_size
+                transfer_progress(tile, size, size)
             progress("download", i, len(tiles), f"{tile} present")
             continue
 
         try:
-            n = download(catalog.url(tile, entry["block"]), out, expected=want or None)
+            kwargs = {}
+            if transfer_progress:
+                kwargs["on_progress"] = lambda received, total, tile=tile: transfer_progress(
+                    tile, received, total)
+            n = download(catalog.url(tile, entry["block"]), out, expected=want or None, **kwargs)
             res.ok += 1
             res.bytes_moved += n
             progress("download", i, len(tiles), f"{tile} {human(n)}")
@@ -134,7 +147,7 @@ _CARRY = [
 ]
 
 
-def colorize_tile(src: Path, dst: Path) -> int:
+def colorize_tile(src: Path, dst: Path, *, ortho_cache: Path | None = None) -> int:
     """Drape IGN BD ORTHO onto one tile, rewriting format 6 -> 7.
 
     LiDAR HD tiles have no RGB fields, so colour means rewriting every point
@@ -151,11 +164,17 @@ def colorize_tile(src: Path, dst: Path) -> int:
     tx = int(x.min() // 1000) * 1000
     ty = int(y.min() // 1000) * 1000
 
-    ortho = dst.with_suffix(".ortho.jpg")
-    ortho.write_bytes(get_bytes(_ortho_url(tx, ty), timeout=300))
+    if ortho_cache is not None:
+        from .ortho import get_ortho
+
+        ortho = get_ortho(tx, ty, ortho_cache)
+    else:
+        ortho = dst.with_suffix(".ortho.jpg")
+        ortho.write_bytes(get_bytes(_ortho_url(tx, ty), timeout=300))
 
     try:
-        arr = np.asarray(Image.open(ortho).convert("RGB"))
+        with Image.open(ortho) as image:
+            arr = np.asarray(image.convert("RGB"))
         h, w, _ = arr.shape
         # Image row 0 is the north edge, so y is flipped against Lambert-93.
         px = np.clip(((x - tx) / 1000 * w).astype(np.int32), 0, w - 1)
@@ -177,13 +196,15 @@ def colorize_tile(src: Path, dst: Path) -> int:
         out.red, out.green, out.blue = rgb[:, 0], rgb[:, 1], rgb[:, 2]
         out.write(str(dst))
     finally:
-        ortho.unlink(missing_ok=True)
+        if ortho_cache is None:
+            ortho.unlink(missing_ok=True)
 
     return len(las.points)
 
 
 def colorize_all(src_dir: Path, dst_dir: Path, progress: Progress = _noop,
-                 should_stop: Callable[[], bool] = lambda: False) -> StageResult:
+                 should_stop: Callable[[], bool] = lambda: False, *,
+                 ortho_cache: Path | None = None) -> StageResult:
     dst_dir.mkdir(parents=True, exist_ok=True)
     tiles = sorted(src_dir.glob("*.copc.laz"))
     res = StageResult()
@@ -198,7 +219,7 @@ def colorize_all(src_dir: Path, dst_dir: Path, progress: Progress = _noop,
             progress("colorize", i, len(tiles), f"{src.name} present")
             continue
         try:
-            n = colorize_tile(src, dst)
+            n = colorize_tile(src, dst, ortho_cache=ortho_cache)
             res.ok += 1
             res.bytes_moved += dst.stat().st_size
             progress("colorize", i, len(tiles), f"{src.name} {n:,} pts".replace(",", " "))
@@ -213,7 +234,28 @@ def colorize_all(src_dir: Path, dst_dir: Path, progress: Progress = _noop,
 # --- stage 3: 3D Tiles -----------------------------------------------------
 
 def py3dtiles_exe() -> Path:
-    return Path(sys.executable).parent / "Scripts" / "py3dtiles.exe"
+    """Locate the py3dtiles entry point.
+
+    In a venv sys.executable already lives in Scripts/ (or bin/), while for a
+    system Python the scripts sit in a sibling Scripts/ directory. Check both,
+    then fall back to PATH.
+    """
+    exe = "py3dtiles.exe" if os.name == "nt" else "py3dtiles"
+    here = Path(sys.executable).parent
+    for candidate in (here / exe,                       # venv layout
+                      here / "Scripts" / exe,           # system Python, Windows
+                      here / "bin" / exe):              # system Python, POSIX
+        if candidate.exists():
+            return candidate
+
+    found = shutil.which("py3dtiles")
+    if found:
+        return Path(found)
+
+    raise FileNotFoundError(
+        "py3dtiles not found. Install it into the environment running this "
+        "app: pip install py3dtiles (or `uv add py3dtiles`)."
+    )
 
 
 def convert_3dtiles(inputs: Iterable[Path], out_dir: Path,
@@ -269,7 +311,8 @@ def upload_dir(local: Path, prefix: str, cfg, progress: Progress = _noop,
     if not client.bucket_exists(cfg.bucket):
         client.make_bucket(cfg.bucket)
 
-    files = [p for p in local.rglob("*") if p.is_file()]
+    files = [p for p in local.rglob("*") if p.is_file()
+             and p.suffix not in (".part", ".tmp") and "tmp" not in p.relative_to(local).parts]
     res = StageResult()
     t0 = time.time()
 
@@ -301,10 +344,107 @@ def upload_dir(local: Path, prefix: str, cfg, progress: Progress = _noop,
     return res
 
 
+# --- cleanup ---------------------------------------------------------------
+
+def tileset_ok(tiles3d: Path) -> bool:
+    """True when a 3D Tiles directory looks like a finished conversion.
+
+    py3dtiles writes into tmp/ while running and only emits tileset.json at the
+    end, so "tileset.json exists, some .pnts exist, tmp/ is gone" distinguishes
+    a completed run from an interrupted one.
+    """
+    if not (tiles3d / "tileset.json").is_file():
+        return False
+    if (tiles3d / "tmp").exists():
+        return False
+    return any(tiles3d.rglob("*.pnts"))
+
+
+def colorized_ok(colorized: Path, expected: int) -> bool:
+    """True when every expected tile was colourised."""
+    if expected <= 0:
+        return False
+    return sum(1 for _ in colorized.glob("*.laz")) >= expected
+
+
+def dir_size(path: Path) -> int:
+    if not path.exists():
+        return 0
+    return sum(p.stat().st_size for p in path.rglob("*") if p.is_file())
+
+
+def remove_tree(path: Path) -> int:
+    """Delete a directory, returning the bytes freed (0 if it was absent)."""
+    if not path.exists():
+        return 0
+    freed = dir_size(path)
+    shutil.rmtree(path, ignore_errors=True)
+    return freed if not path.exists() else 0
+
+
+def sweep_scratch(root: Path) -> int:
+    """Remove interrupted-download leftovers and py3dtiles scratch."""
+    freed = 0
+    for part in root.rglob("*.part"):
+        try:
+            freed += part.stat().st_size
+            part.unlink()
+        except OSError:
+            pass
+    tmp = root / "3dtiles" / "tmp"
+    if tmp.exists():
+        freed += remove_tree(tmp)
+    return freed
+
+
+def cleanup(root: Path, *, expected_tiles: int, did_color: bool,
+            did_tiles: bool, progress: Progress = _noop) -> int:
+    """Drop intermediates whose successor stage completed successfully.
+
+    Deliberately conservative: each stage is only removed once the thing
+    derived from it has been verified on disk. If a later stage failed or was
+    skipped, its input is kept so a re-run does not start from nothing.
+    """
+    raw, colorized, tiles3d = root / "raw", root / "colorized", root / "3dtiles"
+
+    # Decide BEFORE sweeping: sweep_scratch removes 3dtiles/tmp, which is the
+    # very signal that tells an interrupted conversion from a finished one.
+    tiles_done = did_tiles and tileset_ok(tiles3d)
+    freed = sweep_scratch(root)
+
+    color_done = did_color and colorized_ok(colorized, expected_tiles)
+
+    if did_tiles and not tiles_done:
+        # The conversion was asked for but did not finish. Both earlier stages
+        # are the only way to retry it, so keep everything.
+        progress("cleanup", 1, 1, "conversion incomplete - keeping raw/ and colorized/")
+        return freed
+
+    if tiles_done:
+        # The tileset supersedes both earlier stages.
+        for stage, path in (("colorized", colorized), ("raw", raw)):
+            if path.exists():
+                n = remove_tree(path)
+                freed += n
+                progress("cleanup", 0, 1, f"removed {stage}/ ({human(n)})")
+    elif color_done:
+        # No conversion requested: the colourised output is the deliverable,
+        # so only raw/ is redundant.
+        if raw.exists():
+            n = remove_tree(raw)
+            freed += n
+            progress("cleanup", 0, 1, f"removed raw/ ({human(n)})")
+
+    if freed:
+        progress("cleanup", 1, 1, f"freed {human(freed)}")
+    return freed
+
+
 def _content_type(path: Path) -> str:
     return {
         ".json": "application/json",
         ".pnts": "application/octet-stream",
         ".laz": "application/octet-stream",
+        ".pmtiles": "application/vnd.pmtiles",
         ".html": "text/html",
     }.get(path.suffix.lower(), "application/octet-stream")

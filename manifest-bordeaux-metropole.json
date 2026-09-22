@@ -1,0 +1,4722 @@
+{
+ "area": "Bordeaux M\u00e9tropole (EPCI 243300316, 28 communes)",
+ "crs": "EPSG:2154 (Lambert-93)",
+ "tile_size_km": 1,
+ "tile_count": 673,
+ "total_bytes": 80047888679,
+ "total_gb": 80.05,
+ "source": "IGN LiDAR HD / G\u00e9oplateforme LiDARHD-NUALID",
+ "tiles": [
+  {
+   "name": "LHD_FXX_0393_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 142755311,
+   "x_km": 393,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0393_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 102809237,
+   "x_km": 393,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0393_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 124336964,
+   "x_km": 393,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0393_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 95125766,
+   "x_km": 393,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0393_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 121223605,
+   "x_km": 393,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0394_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 108389890,
+   "x_km": 394,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0394_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 112663790,
+   "x_km": 394,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0394_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 111058489,
+   "x_km": 394,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0394_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 103924221,
+   "x_km": 394,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0394_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 134024533,
+   "x_km": 394,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0395_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 8228741,
+   "x_km": 395,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0395_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 110200778,
+   "x_km": 395,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0395_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 146064710,
+   "x_km": 395,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0395_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 86265725,
+   "x_km": 395,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0395_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 124012781,
+   "x_km": 395,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0395_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 155140195,
+   "x_km": 395,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0396_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 88546176,
+   "x_km": 396,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0396_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 6970650,
+   "x_km": 396,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0396_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 61735169,
+   "x_km": 396,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0396_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 133973060,
+   "x_km": 396,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0396_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 171031365,
+   "x_km": 396,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0396_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 122456977,
+   "x_km": 396,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0396_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 108032392,
+   "x_km": 396,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0396_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 146189013,
+   "x_km": 396,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0396_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 140928144,
+   "x_km": 396,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0396_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 165915703,
+   "x_km": 396,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0397_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 159830904,
+   "x_km": 397,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0397_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 155526799,
+   "x_km": 397,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0397_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 136257245,
+   "x_km": 397,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0397_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 92910395,
+   "x_km": 397,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0397_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 156008154,
+   "x_km": 397,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0397_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 164714143,
+   "x_km": 397,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0397_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 80616839,
+   "x_km": 397,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0397_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 146478368,
+   "x_km": 397,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0397_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 143745712,
+   "x_km": 397,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0397_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 156781781,
+   "x_km": 397,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0397_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 140878073,
+   "x_km": 397,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0397_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 155485527,
+   "x_km": 397,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0398_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 143051929,
+   "x_km": 398,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0398_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 146125916,
+   "x_km": 398,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0398_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 123726969,
+   "x_km": 398,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0398_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 118319723,
+   "x_km": 398,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0398_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 136261735,
+   "x_km": 398,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0398_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 159243497,
+   "x_km": 398,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0398_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 117495208,
+   "x_km": 398,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0398_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 133419157,
+   "x_km": 398,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0398_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 149889903,
+   "x_km": 398,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0398_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 183165702,
+   "x_km": 398,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0398_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 174783021,
+   "x_km": 398,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0398_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 154703331,
+   "x_km": 398,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0399_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 143458883,
+   "x_km": 399,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0399_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 162830238,
+   "x_km": 399,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0399_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 131406115,
+   "x_km": 399,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0399_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 137767066,
+   "x_km": 399,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0399_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 138685559,
+   "x_km": 399,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0399_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 192230418,
+   "x_km": 399,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0399_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 153327499,
+   "x_km": 399,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0399_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 189730827,
+   "x_km": 399,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0399_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 158102502,
+   "x_km": 399,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0399_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 165356398,
+   "x_km": 399,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0399_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 152187288,
+   "x_km": 399,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0399_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 170659067,
+   "x_km": 399,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0400_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 145609783,
+   "x_km": 400,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0400_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 189526364,
+   "x_km": 400,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0400_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 114490515,
+   "x_km": 400,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0400_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 133109423,
+   "x_km": 400,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0400_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 129328456,
+   "x_km": 400,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0400_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 179894520,
+   "x_km": 400,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0400_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 132187396,
+   "x_km": 400,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0400_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 195174124,
+   "x_km": 400,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0400_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 156044215,
+   "x_km": 400,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0400_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 150925054,
+   "x_km": 400,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0400_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 153372217,
+   "x_km": 400,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0400_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 189664568,
+   "x_km": 400,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0400_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 160117476,
+   "x_km": 400,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0400_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 217593837,
+   "x_km": 400,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0401_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 165151394,
+   "x_km": 401,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0401_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 136009618,
+   "x_km": 401,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0401_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 112313893,
+   "x_km": 401,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0401_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 121206493,
+   "x_km": 401,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0401_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 128578648,
+   "x_km": 401,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0401_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 177273487,
+   "x_km": 401,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0401_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 124155962,
+   "x_km": 401,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0401_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 165093939,
+   "x_km": 401,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0401_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 155502558,
+   "x_km": 401,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0401_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 169850720,
+   "x_km": 401,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0401_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 123248688,
+   "x_km": 401,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0401_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 167777409,
+   "x_km": 401,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0401_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 162083967,
+   "x_km": 401,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0401_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 199663207,
+   "x_km": 401,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0402_6413_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 167781658,
+   "x_km": 402,
+   "y_km": 6413
+  },
+  {
+   "name": "LHD_FXX_0402_6414_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 201085086,
+   "x_km": 402,
+   "y_km": 6414
+  },
+  {
+   "name": "LHD_FXX_0402_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 174250315,
+   "x_km": 402,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0402_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 135682701,
+   "x_km": 402,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0402_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 132254514,
+   "x_km": 402,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0402_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 165763841,
+   "x_km": 402,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0402_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 159409152,
+   "x_km": 402,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0402_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 150718788,
+   "x_km": 402,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0402_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 40461300,
+   "x_km": 402,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0402_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 156235707,
+   "x_km": 402,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0402_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 129438008,
+   "x_km": 402,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0402_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 175267909,
+   "x_km": 402,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0402_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 141388325,
+   "x_km": 402,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0402_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 174144913,
+   "x_km": 402,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0402_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 156072352,
+   "x_km": 402,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0402_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 195513833,
+   "x_km": 402,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0402_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 104981409,
+   "x_km": 402,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0403_6413_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 193047539,
+   "x_km": 403,
+   "y_km": 6413
+  },
+  {
+   "name": "LHD_FXX_0403_6414_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 150778089,
+   "x_km": 403,
+   "y_km": 6414
+  },
+  {
+   "name": "LHD_FXX_0403_6415_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 117707295,
+   "x_km": 403,
+   "y_km": 6415
+  },
+  {
+   "name": "LHD_FXX_0403_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 143948459,
+   "x_km": 403,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0403_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 171802320,
+   "x_km": 403,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0403_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 154925397,
+   "x_km": 403,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0403_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 179651938,
+   "x_km": 403,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0403_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 90811178,
+   "x_km": 403,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0403_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 154006330,
+   "x_km": 403,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0403_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 135502553,
+   "x_km": 403,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0403_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 137061835,
+   "x_km": 403,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0403_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 126663595,
+   "x_km": 403,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0403_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 205588553,
+   "x_km": 403,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0403_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 193329182,
+   "x_km": 403,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0403_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 165522807,
+   "x_km": 403,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0403_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 184391035,
+   "x_km": 403,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0403_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 174578402,
+   "x_km": 403,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0403_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 108677073,
+   "x_km": 403,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0403_6437_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 111814299,
+   "x_km": 403,
+   "y_km": 6437
+  },
+  {
+   "name": "LHD_FXX_0404_6414_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 128717694,
+   "x_km": 404,
+   "y_km": 6414
+  },
+  {
+   "name": "LHD_FXX_0404_6415_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 130916380,
+   "x_km": 404,
+   "y_km": 6415
+  },
+  {
+   "name": "LHD_FXX_0404_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 177454813,
+   "x_km": 404,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0404_6417_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 121206181,
+   "x_km": 404,
+   "y_km": 6417
+  },
+  {
+   "name": "LHD_FXX_0404_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 94761812,
+   "x_km": 404,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0404_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 105056148,
+   "x_km": 404,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0404_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 148303709,
+   "x_km": 404,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0404_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 139179270,
+   "x_km": 404,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0404_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 145700272,
+   "x_km": 404,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0404_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 145952088,
+   "x_km": 404,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0404_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 200766751,
+   "x_km": 404,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0404_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 154469490,
+   "x_km": 404,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0404_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 124717831,
+   "x_km": 404,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0404_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 135860863,
+   "x_km": 404,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0404_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 120291080,
+   "x_km": 404,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0404_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 111167720,
+   "x_km": 404,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0404_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 139702597,
+   "x_km": 404,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0404_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 145808663,
+   "x_km": 404,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0404_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 178461483,
+   "x_km": 404,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0404_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 176159871,
+   "x_km": 404,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0404_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 199424036,
+   "x_km": 404,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0404_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 105947398,
+   "x_km": 404,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0404_6437_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 120270911,
+   "x_km": 404,
+   "y_km": 6437
+  },
+  {
+   "name": "LHD_FXX_0405_6414_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 147877271,
+   "x_km": 405,
+   "y_km": 6414
+  },
+  {
+   "name": "LHD_FXX_0405_6415_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 138881703,
+   "x_km": 405,
+   "y_km": 6415
+  },
+  {
+   "name": "LHD_FXX_0405_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 202764504,
+   "x_km": 405,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0405_6417_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 150488821,
+   "x_km": 405,
+   "y_km": 6417
+  },
+  {
+   "name": "LHD_FXX_0405_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 104614298,
+   "x_km": 405,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0405_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 132334620,
+   "x_km": 405,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0405_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 113849178,
+   "x_km": 405,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0405_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 94414057,
+   "x_km": 405,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0405_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 92675702,
+   "x_km": 405,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0405_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 144598695,
+   "x_km": 405,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0405_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 142858669,
+   "x_km": 405,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0405_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 132803796,
+   "x_km": 405,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0405_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 99179740,
+   "x_km": 405,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0405_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 28854946,
+   "x_km": 405,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0405_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 62897870,
+   "x_km": 405,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0405_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 96893904,
+   "x_km": 405,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0405_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 130956061,
+   "x_km": 405,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0405_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 165497953,
+   "x_km": 405,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0405_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 126211214,
+   "x_km": 405,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0405_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 172458564,
+   "x_km": 405,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0405_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 154212128,
+   "x_km": 405,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0405_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 189942668,
+   "x_km": 405,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0405_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 118158132,
+   "x_km": 405,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0405_6437_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 114837361,
+   "x_km": 405,
+   "y_km": 6437
+  },
+  {
+   "name": "LHD_FXX_0406_6415_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 119795333,
+   "x_km": 406,
+   "y_km": 6415
+  },
+  {
+   "name": "LHD_FXX_0406_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 154047541,
+   "x_km": 406,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0406_6417_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 131074218,
+   "x_km": 406,
+   "y_km": 6417
+  },
+  {
+   "name": "LHD_FXX_0406_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 111159931,
+   "x_km": 406,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0406_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 130002192,
+   "x_km": 406,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0406_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 116487478,
+   "x_km": 406,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0406_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 30268469,
+   "x_km": 406,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0406_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 64074393,
+   "x_km": 406,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0406_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 86645505,
+   "x_km": 406,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0406_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 125648453,
+   "x_km": 406,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0406_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 194583569,
+   "x_km": 406,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0406_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 118762377,
+   "x_km": 406,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0406_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 29870612,
+   "x_km": 406,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0406_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 29638052,
+   "x_km": 406,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0406_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 145131513,
+   "x_km": 406,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0406_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 140459751,
+   "x_km": 406,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0406_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 131044766,
+   "x_km": 406,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0406_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 137553357,
+   "x_km": 406,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0406_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 223425023,
+   "x_km": 406,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0406_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 144493077,
+   "x_km": 406,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0406_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 180609759,
+   "x_km": 406,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0406_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 116078124,
+   "x_km": 406,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0407_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 150984775,
+   "x_km": 407,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0407_6417_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 138672927,
+   "x_km": 407,
+   "y_km": 6417
+  },
+  {
+   "name": "LHD_FXX_0407_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 141162176,
+   "x_km": 407,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0407_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 169370971,
+   "x_km": 407,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0407_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 138569539,
+   "x_km": 407,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0407_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 32663026,
+   "x_km": 407,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0407_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 68299727,
+   "x_km": 407,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0407_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 68900790,
+   "x_km": 407,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0407_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 94378835,
+   "x_km": 407,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0407_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 143331855,
+   "x_km": 407,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0407_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 115369282,
+   "x_km": 407,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0407_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 110884811,
+   "x_km": 407,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0407_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 89193864,
+   "x_km": 407,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0407_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 123161631,
+   "x_km": 407,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0407_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 118689901,
+   "x_km": 407,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0407_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 196486484,
+   "x_km": 407,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0407_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 181301375,
+   "x_km": 407,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0407_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 228214987,
+   "x_km": 407,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0407_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 149563630,
+   "x_km": 407,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0407_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 149933987,
+   "x_km": 407,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0408_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 163991851,
+   "x_km": 408,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0408_6417_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 121164246,
+   "x_km": 408,
+   "y_km": 6417
+  },
+  {
+   "name": "LHD_FXX_0408_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 133076440,
+   "x_km": 408,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0408_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 172972235,
+   "x_km": 408,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0408_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 149661856,
+   "x_km": 408,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0408_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 110604047,
+   "x_km": 408,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0408_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 91595713,
+   "x_km": 408,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0408_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 95484485,
+   "x_km": 408,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0408_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 106646811,
+   "x_km": 408,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0408_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 116214660,
+   "x_km": 408,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0408_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 108455378,
+   "x_km": 408,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0408_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 100561453,
+   "x_km": 408,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0408_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 93315890,
+   "x_km": 408,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0408_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 203120674,
+   "x_km": 408,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0408_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 118929045,
+   "x_km": 408,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0408_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 155167377,
+   "x_km": 408,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0408_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 200364045,
+   "x_km": 408,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0408_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 206897748,
+   "x_km": 408,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0409_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 176197431,
+   "x_km": 409,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0409_6417_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 121290561,
+   "x_km": 409,
+   "y_km": 6417
+  },
+  {
+   "name": "LHD_FXX_0409_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 111576804,
+   "x_km": 409,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0409_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 143250138,
+   "x_km": 409,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0409_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 141136046,
+   "x_km": 409,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0409_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 114164950,
+   "x_km": 409,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0409_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 96959313,
+   "x_km": 409,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0409_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 99097173,
+   "x_km": 409,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0409_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 87873580,
+   "x_km": 409,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0409_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 111485053,
+   "x_km": 409,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0409_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 93317968,
+   "x_km": 409,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0409_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 103725966,
+   "x_km": 409,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0409_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 110641637,
+   "x_km": 409,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0409_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 195698002,
+   "x_km": 409,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0409_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 112969768,
+   "x_km": 409,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0409_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 118851538,
+   "x_km": 409,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0409_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 160697694,
+   "x_km": 409,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0409_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 203442592,
+   "x_km": 409,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0410_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 132458562,
+   "x_km": 410,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0410_6417_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 125013945,
+   "x_km": 410,
+   "y_km": 6417
+  },
+  {
+   "name": "LHD_FXX_0410_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 126138500,
+   "x_km": 410,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0410_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 110389573,
+   "x_km": 410,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0410_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 123940057,
+   "x_km": 410,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0410_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 110746780,
+   "x_km": 410,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0410_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 92995272,
+   "x_km": 410,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0410_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 105089553,
+   "x_km": 410,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0410_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 92778772,
+   "x_km": 410,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0410_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 103064339,
+   "x_km": 410,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0410_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 103758589,
+   "x_km": 410,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0410_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 114328819,
+   "x_km": 410,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0410_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 96758605,
+   "x_km": 410,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0410_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 111940583,
+   "x_km": 410,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0410_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 106130221,
+   "x_km": 410,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0410_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 169279318,
+   "x_km": 410,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0410_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 166781346,
+   "x_km": 410,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0410_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 217285590,
+   "x_km": 410,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0410_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 190932629,
+   "x_km": 410,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0411_6414_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 149004611,
+   "x_km": 411,
+   "y_km": 6414
+  },
+  {
+   "name": "LHD_FXX_0411_6415_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 102322262,
+   "x_km": 411,
+   "y_km": 6415
+  },
+  {
+   "name": "LHD_FXX_0411_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 96883815,
+   "x_km": 411,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0411_6417_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 109971980,
+   "x_km": 411,
+   "y_km": 6417
+  },
+  {
+   "name": "LHD_FXX_0411_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 133215399,
+   "x_km": 411,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0411_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 107004226,
+   "x_km": 411,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0411_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 134085683,
+   "x_km": 411,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0411_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 119362757,
+   "x_km": 411,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0411_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 112839338,
+   "x_km": 411,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0411_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 120921817,
+   "x_km": 411,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0411_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 106266788,
+   "x_km": 411,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0411_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 104080139,
+   "x_km": 411,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0411_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 102794921,
+   "x_km": 411,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0411_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 136531342,
+   "x_km": 411,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0411_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 88871488,
+   "x_km": 411,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0411_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 98005611,
+   "x_km": 411,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0411_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 111126857,
+   "x_km": 411,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0411_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 134245954,
+   "x_km": 411,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0411_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 195027020,
+   "x_km": 411,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0411_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 192711967,
+   "x_km": 411,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0411_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 186627026,
+   "x_km": 411,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0412_6412_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 182608814,
+   "x_km": 412,
+   "y_km": 6412
+  },
+  {
+   "name": "LHD_FXX_0412_6413_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 161155766,
+   "x_km": 412,
+   "y_km": 6413
+  },
+  {
+   "name": "LHD_FXX_0412_6414_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 146737797,
+   "x_km": 412,
+   "y_km": 6414
+  },
+  {
+   "name": "LHD_FXX_0412_6415_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 111665455,
+   "x_km": 412,
+   "y_km": 6415
+  },
+  {
+   "name": "LHD_FXX_0412_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 136018912,
+   "x_km": 412,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0412_6417_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 104344107,
+   "x_km": 412,
+   "y_km": 6417
+  },
+  {
+   "name": "LHD_FXX_0412_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 123478862,
+   "x_km": 412,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0412_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 112337531,
+   "x_km": 412,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0412_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 134780166,
+   "x_km": 412,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0412_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 124021548,
+   "x_km": 412,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0412_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 104558929,
+   "x_km": 412,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0412_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 104009372,
+   "x_km": 412,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0412_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 98703754,
+   "x_km": 412,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0412_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 107800036,
+   "x_km": 412,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0412_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 104379173,
+   "x_km": 412,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0412_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 114730750,
+   "x_km": 412,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0412_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 95663797,
+   "x_km": 412,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0412_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 103999547,
+   "x_km": 412,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0412_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 116097075,
+   "x_km": 412,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0412_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 113880267,
+   "x_km": 412,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0412_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 118063997,
+   "x_km": 412,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0412_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 118818482,
+   "x_km": 412,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0412_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 157796215,
+   "x_km": 412,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0413_6412_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 160988727,
+   "x_km": 413,
+   "y_km": 6412
+  },
+  {
+   "name": "LHD_FXX_0413_6413_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 143951406,
+   "x_km": 413,
+   "y_km": 6413
+  },
+  {
+   "name": "LHD_FXX_0413_6414_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 159986435,
+   "x_km": 413,
+   "y_km": 6414
+  },
+  {
+   "name": "LHD_FXX_0413_6415_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 116532045,
+   "x_km": 413,
+   "y_km": 6415
+  },
+  {
+   "name": "LHD_FXX_0413_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 140934564,
+   "x_km": 413,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0413_6417_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 133875868,
+   "x_km": 413,
+   "y_km": 6417
+  },
+  {
+   "name": "LHD_FXX_0413_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 115701452,
+   "x_km": 413,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0413_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 110342636,
+   "x_km": 413,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0413_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 107940077,
+   "x_km": 413,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0413_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 107873769,
+   "x_km": 413,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0413_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 110552344,
+   "x_km": 413,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0413_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 104035697,
+   "x_km": 413,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0413_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 102131216,
+   "x_km": 413,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0413_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 109010773,
+   "x_km": 413,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0413_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 88953929,
+   "x_km": 413,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0413_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 104634211,
+   "x_km": 413,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0413_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 103138572,
+   "x_km": 413,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0413_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 90139837,
+   "x_km": 413,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0413_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 107758381,
+   "x_km": 413,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0413_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 115900912,
+   "x_km": 413,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0413_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 96803920,
+   "x_km": 413,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0413_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 157118331,
+   "x_km": 413,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0413_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 149201863,
+   "x_km": 413,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0413_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 211465375,
+   "x_km": 413,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0413_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 119172952,
+   "x_km": 413,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0414_6413_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 164303028,
+   "x_km": 414,
+   "y_km": 6413
+  },
+  {
+   "name": "LHD_FXX_0414_6414_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 151245166,
+   "x_km": 414,
+   "y_km": 6414
+  },
+  {
+   "name": "LHD_FXX_0414_6415_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 114224357,
+   "x_km": 414,
+   "y_km": 6415
+  },
+  {
+   "name": "LHD_FXX_0414_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 130238772,
+   "x_km": 414,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0414_6417_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 126712170,
+   "x_km": 414,
+   "y_km": 6417
+  },
+  {
+   "name": "LHD_FXX_0414_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 109733176,
+   "x_km": 414,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0414_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 105979357,
+   "x_km": 414,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0414_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 104763482,
+   "x_km": 414,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0414_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 111097044,
+   "x_km": 414,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0414_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 99751408,
+   "x_km": 414,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0414_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 105159802,
+   "x_km": 414,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0414_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 102506234,
+   "x_km": 414,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0414_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 110488104,
+   "x_km": 414,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0414_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 92881522,
+   "x_km": 414,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0414_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 113299119,
+   "x_km": 414,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0414_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 91419489,
+   "x_km": 414,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0414_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 99876155,
+   "x_km": 414,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0414_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 95198995,
+   "x_km": 414,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0414_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 93782040,
+   "x_km": 414,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0414_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 78420551,
+   "x_km": 414,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0414_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 117302182,
+   "x_km": 414,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0414_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 123264372,
+   "x_km": 414,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0414_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 223994824,
+   "x_km": 414,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0414_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 138031633,
+   "x_km": 414,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0414_6437_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 115868596,
+   "x_km": 414,
+   "y_km": 6437
+  },
+  {
+   "name": "LHD_FXX_0415_6414_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 157836868,
+   "x_km": 415,
+   "y_km": 6414
+  },
+  {
+   "name": "LHD_FXX_0415_6415_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 108784573,
+   "x_km": 415,
+   "y_km": 6415
+  },
+  {
+   "name": "LHD_FXX_0415_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 104673372,
+   "x_km": 415,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0415_6417_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 139200838,
+   "x_km": 415,
+   "y_km": 6417
+  },
+  {
+   "name": "LHD_FXX_0415_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 115926605,
+   "x_km": 415,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0415_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 103856780,
+   "x_km": 415,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0415_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 111161153,
+   "x_km": 415,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0415_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 103688937,
+   "x_km": 415,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0415_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 97154007,
+   "x_km": 415,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0415_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 102974837,
+   "x_km": 415,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0415_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 114367417,
+   "x_km": 415,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0415_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 109910664,
+   "x_km": 415,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0415_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 93145916,
+   "x_km": 415,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0415_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 114879501,
+   "x_km": 415,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0415_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 85970138,
+   "x_km": 415,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0415_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 97988878,
+   "x_km": 415,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0415_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 133045024,
+   "x_km": 415,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0415_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 71486221,
+   "x_km": 415,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0415_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 88938690,
+   "x_km": 415,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0415_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 130800721,
+   "x_km": 415,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0415_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 147038018,
+   "x_km": 415,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0415_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 154497346,
+   "x_km": 415,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0415_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 103030742,
+   "x_km": 415,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0415_6437_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 90815772,
+   "x_km": 415,
+   "y_km": 6437
+  },
+  {
+   "name": "LHD_FXX_0416_6412_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 116729785,
+   "x_km": 416,
+   "y_km": 6412
+  },
+  {
+   "name": "LHD_FXX_0416_6413_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 116542412,
+   "x_km": 416,
+   "y_km": 6413
+  },
+  {
+   "name": "LHD_FXX_0416_6414_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 115899467,
+   "x_km": 416,
+   "y_km": 6414
+  },
+  {
+   "name": "LHD_FXX_0416_6415_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 109040946,
+   "x_km": 416,
+   "y_km": 6415
+  },
+  {
+   "name": "LHD_FXX_0416_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 125262750,
+   "x_km": 416,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0416_6417_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 106976197,
+   "x_km": 416,
+   "y_km": 6417
+  },
+  {
+   "name": "LHD_FXX_0416_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 111892455,
+   "x_km": 416,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0416_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 110570975,
+   "x_km": 416,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0416_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 106788322,
+   "x_km": 416,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0416_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 104126192,
+   "x_km": 416,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0416_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 95122769,
+   "x_km": 416,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0416_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 101984968,
+   "x_km": 416,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0416_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 99195936,
+   "x_km": 416,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0416_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 111564635,
+   "x_km": 416,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0416_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 92137634,
+   "x_km": 416,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0416_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 96403153,
+   "x_km": 416,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0416_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 84697362,
+   "x_km": 416,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0416_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 101992329,
+   "x_km": 416,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0416_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 91395246,
+   "x_km": 416,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0416_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 67280815,
+   "x_km": 416,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0416_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 51074656,
+   "x_km": 416,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0416_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 69915897,
+   "x_km": 416,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0416_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 118360634,
+   "x_km": 416,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0416_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 165850098,
+   "x_km": 416,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0416_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 92437493,
+   "x_km": 416,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0416_6437_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 81993593,
+   "x_km": 416,
+   "y_km": 6437
+  },
+  {
+   "name": "LHD_FXX_0416_6443_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 119468962,
+   "x_km": 416,
+   "y_km": 6443
+  },
+  {
+   "name": "LHD_FXX_0416_6444_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 103316568,
+   "x_km": 416,
+   "y_km": 6444
+  },
+  {
+   "name": "LHD_FXX_0416_6445_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 108078546,
+   "x_km": 416,
+   "y_km": 6445
+  },
+  {
+   "name": "LHD_FXX_0417_6412_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 120545901,
+   "x_km": 417,
+   "y_km": 6412
+  },
+  {
+   "name": "LHD_FXX_0417_6413_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 137890479,
+   "x_km": 417,
+   "y_km": 6413
+  },
+  {
+   "name": "LHD_FXX_0417_6414_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 116884277,
+   "x_km": 417,
+   "y_km": 6414
+  },
+  {
+   "name": "LHD_FXX_0417_6415_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 105379038,
+   "x_km": 417,
+   "y_km": 6415
+  },
+  {
+   "name": "LHD_FXX_0417_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 113507596,
+   "x_km": 417,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0417_6417_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 100022555,
+   "x_km": 417,
+   "y_km": 6417
+  },
+  {
+   "name": "LHD_FXX_0417_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 108662720,
+   "x_km": 417,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0417_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 107919889,
+   "x_km": 417,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0417_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 106534889,
+   "x_km": 417,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0417_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 104624005,
+   "x_km": 417,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0417_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 96599757,
+   "x_km": 417,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0417_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 103434249,
+   "x_km": 417,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0417_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 95801019,
+   "x_km": 417,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0417_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 104409822,
+   "x_km": 417,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0417_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 94689393,
+   "x_km": 417,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0417_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 60619101,
+   "x_km": 417,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0417_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 35903556,
+   "x_km": 417,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0417_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 133606490,
+   "x_km": 417,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0417_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 100799382,
+   "x_km": 417,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0417_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 125475767,
+   "x_km": 417,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0417_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 98153035,
+   "x_km": 417,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0417_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 96024318,
+   "x_km": 417,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0417_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 109278310,
+   "x_km": 417,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0417_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 108238095,
+   "x_km": 417,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0417_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 67348796,
+   "x_km": 417,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0417_6437_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 75823973,
+   "x_km": 417,
+   "y_km": 6437
+  },
+  {
+   "name": "LHD_FXX_0417_6442_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 110704536,
+   "x_km": 417,
+   "y_km": 6442
+  },
+  {
+   "name": "LHD_FXX_0417_6443_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 173169270,
+   "x_km": 417,
+   "y_km": 6443
+  },
+  {
+   "name": "LHD_FXX_0417_6444_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 146619629,
+   "x_km": 417,
+   "y_km": 6444
+  },
+  {
+   "name": "LHD_FXX_0417_6445_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 130709890,
+   "x_km": 417,
+   "y_km": 6445
+  },
+  {
+   "name": "LHD_FXX_0418_6412_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 130492046,
+   "x_km": 418,
+   "y_km": 6412
+  },
+  {
+   "name": "LHD_FXX_0418_6413_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 124078740,
+   "x_km": 418,
+   "y_km": 6413
+  },
+  {
+   "name": "LHD_FXX_0418_6414_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 119994580,
+   "x_km": 418,
+   "y_km": 6414
+  },
+  {
+   "name": "LHD_FXX_0418_6415_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 110653568,
+   "x_km": 418,
+   "y_km": 6415
+  },
+  {
+   "name": "LHD_FXX_0418_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 117419007,
+   "x_km": 418,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0418_6417_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 133927825,
+   "x_km": 418,
+   "y_km": 6417
+  },
+  {
+   "name": "LHD_FXX_0418_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 110394275,
+   "x_km": 418,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0418_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 104324963,
+   "x_km": 418,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0418_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 96367791,
+   "x_km": 418,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0418_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 102438183,
+   "x_km": 418,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0418_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 79990427,
+   "x_km": 418,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0418_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 87756796,
+   "x_km": 418,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0418_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 80714127,
+   "x_km": 418,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0418_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 99719554,
+   "x_km": 418,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0418_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 88172799,
+   "x_km": 418,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0418_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 91899595,
+   "x_km": 418,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0418_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 66298420,
+   "x_km": 418,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0418_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 101362424,
+   "x_km": 418,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0418_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 94951498,
+   "x_km": 418,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0418_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 91451994,
+   "x_km": 418,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0418_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 77117743,
+   "x_km": 418,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0418_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 87569401,
+   "x_km": 418,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0418_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 96943861,
+   "x_km": 418,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0418_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 99035357,
+   "x_km": 418,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0418_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 58598470,
+   "x_km": 418,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0418_6437_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 70741866,
+   "x_km": 418,
+   "y_km": 6437
+  },
+  {
+   "name": "LHD_FXX_0418_6441_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 87483030,
+   "x_km": 418,
+   "y_km": 6441
+  },
+  {
+   "name": "LHD_FXX_0418_6442_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 182691335,
+   "x_km": 418,
+   "y_km": 6442
+  },
+  {
+   "name": "LHD_FXX_0418_6443_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 134967366,
+   "x_km": 418,
+   "y_km": 6443
+  },
+  {
+   "name": "LHD_FXX_0418_6444_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 68553148,
+   "x_km": 418,
+   "y_km": 6444
+  },
+  {
+   "name": "LHD_FXX_0419_6413_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 124636291,
+   "x_km": 419,
+   "y_km": 6413
+  },
+  {
+   "name": "LHD_FXX_0419_6414_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 129416825,
+   "x_km": 419,
+   "y_km": 6414
+  },
+  {
+   "name": "LHD_FXX_0419_6415_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 94818047,
+   "x_km": 419,
+   "y_km": 6415
+  },
+  {
+   "name": "LHD_FXX_0419_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 112563928,
+   "x_km": 419,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0419_6417_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 116572541,
+   "x_km": 419,
+   "y_km": 6417
+  },
+  {
+   "name": "LHD_FXX_0419_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 108105141,
+   "x_km": 419,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0419_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 105064942,
+   "x_km": 419,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0419_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 102278341,
+   "x_km": 419,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0419_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 82017424,
+   "x_km": 419,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0419_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 83871384,
+   "x_km": 419,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0419_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 97174742,
+   "x_km": 419,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0419_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 79655761,
+   "x_km": 419,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0419_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 79069446,
+   "x_km": 419,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0419_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 89404373,
+   "x_km": 419,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0419_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 100491871,
+   "x_km": 419,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0419_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 97588689,
+   "x_km": 419,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0419_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 97658896,
+   "x_km": 419,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0419_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 90377609,
+   "x_km": 419,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0419_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 93399752,
+   "x_km": 419,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0419_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 62597746,
+   "x_km": 419,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0419_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 76130121,
+   "x_km": 419,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0419_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 99417512,
+   "x_km": 419,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0419_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 124913494,
+   "x_km": 419,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0419_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 71018502,
+   "x_km": 419,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0419_6437_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 70599173,
+   "x_km": 419,
+   "y_km": 6437
+  },
+  {
+   "name": "LHD_FXX_0419_6439_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 96006644,
+   "x_km": 419,
+   "y_km": 6439
+  },
+  {
+   "name": "LHD_FXX_0419_6440_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 99074940,
+   "x_km": 419,
+   "y_km": 6440
+  },
+  {
+   "name": "LHD_FXX_0419_6441_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 110440269,
+   "x_km": 419,
+   "y_km": 6441
+  },
+  {
+   "name": "LHD_FXX_0419_6442_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 150882229,
+   "x_km": 419,
+   "y_km": 6442
+  },
+  {
+   "name": "LHD_FXX_0419_6443_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 90906558,
+   "x_km": 419,
+   "y_km": 6443
+  },
+  {
+   "name": "LHD_FXX_0419_6444_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 58477210,
+   "x_km": 419,
+   "y_km": 6444
+  },
+  {
+   "name": "LHD_FXX_0420_6414_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 177951848,
+   "x_km": 420,
+   "y_km": 6414
+  },
+  {
+   "name": "LHD_FXX_0420_6415_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 104030383,
+   "x_km": 420,
+   "y_km": 6415
+  },
+  {
+   "name": "LHD_FXX_0420_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 84927194,
+   "x_km": 420,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0420_6417_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 86613236,
+   "x_km": 420,
+   "y_km": 6417
+  },
+  {
+   "name": "LHD_FXX_0420_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 97907615,
+   "x_km": 420,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0420_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 103552117,
+   "x_km": 420,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0420_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 70841499,
+   "x_km": 420,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0420_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 66516597,
+   "x_km": 420,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0420_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 91592279,
+   "x_km": 420,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0420_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 99424020,
+   "x_km": 420,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0420_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 87338984,
+   "x_km": 420,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0420_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 92635269,
+   "x_km": 420,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0420_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 94121788,
+   "x_km": 420,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0420_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 91957908,
+   "x_km": 420,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0420_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 84107057,
+   "x_km": 420,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0420_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 87785062,
+   "x_km": 420,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0420_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 72934940,
+   "x_km": 420,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0420_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 85451795,
+   "x_km": 420,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0420_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 69499172,
+   "x_km": 420,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0420_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 60723368,
+   "x_km": 420,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0420_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 73990765,
+   "x_km": 420,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0420_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 109287230,
+   "x_km": 420,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0420_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 76390255,
+   "x_km": 420,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0420_6437_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 69019977,
+   "x_km": 420,
+   "y_km": 6437
+  },
+  {
+   "name": "LHD_FXX_0420_6438_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 65646605,
+   "x_km": 420,
+   "y_km": 6438
+  },
+  {
+   "name": "LHD_FXX_0420_6439_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 61750342,
+   "x_km": 420,
+   "y_km": 6439
+  },
+  {
+   "name": "LHD_FXX_0420_6440_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 122109824,
+   "x_km": 420,
+   "y_km": 6440
+  },
+  {
+   "name": "LHD_FXX_0420_6441_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 129601998,
+   "x_km": 420,
+   "y_km": 6441
+  },
+  {
+   "name": "LHD_FXX_0420_6442_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 96104951,
+   "x_km": 420,
+   "y_km": 6442
+  },
+  {
+   "name": "LHD_FXX_0420_6443_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 62700142,
+   "x_km": 420,
+   "y_km": 6443
+  },
+  {
+   "name": "LHD_FXX_0420_6444_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 63874754,
+   "x_km": 420,
+   "y_km": 6444
+  },
+  {
+   "name": "LHD_FXX_0421_6414_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 112719978,
+   "x_km": 421,
+   "y_km": 6414
+  },
+  {
+   "name": "LHD_FXX_0421_6415_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 94306845,
+   "x_km": 421,
+   "y_km": 6415
+  },
+  {
+   "name": "LHD_FXX_0421_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 107974166,
+   "x_km": 421,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0421_6417_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 93737441,
+   "x_km": 421,
+   "y_km": 6417
+  },
+  {
+   "name": "LHD_FXX_0421_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 113469585,
+   "x_km": 421,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0421_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 91635177,
+   "x_km": 421,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0421_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 105795776,
+   "x_km": 421,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0421_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 124632621,
+   "x_km": 421,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0421_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 131429129,
+   "x_km": 421,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0421_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 140464449,
+   "x_km": 421,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0421_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 117096259,
+   "x_km": 421,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0421_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 132899143,
+   "x_km": 421,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0421_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 117556215,
+   "x_km": 421,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0421_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 109207182,
+   "x_km": 421,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0421_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 87016826,
+   "x_km": 421,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0421_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 88400290,
+   "x_km": 421,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0421_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 86747860,
+   "x_km": 421,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0421_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 103986011,
+   "x_km": 421,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0421_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 86187124,
+   "x_km": 421,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0421_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 85600090,
+   "x_km": 421,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0421_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 98339013,
+   "x_km": 421,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0421_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 134338955,
+   "x_km": 421,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0421_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 78581973,
+   "x_km": 421,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0421_6437_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 71682632,
+   "x_km": 421,
+   "y_km": 6437
+  },
+  {
+   "name": "LHD_FXX_0421_6438_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 79470792,
+   "x_km": 421,
+   "y_km": 6438
+  },
+  {
+   "name": "LHD_FXX_0421_6439_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 88046875,
+   "x_km": 421,
+   "y_km": 6439
+  },
+  {
+   "name": "LHD_FXX_0421_6440_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 88608000,
+   "x_km": 421,
+   "y_km": 6440
+  },
+  {
+   "name": "LHD_FXX_0421_6441_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 84680571,
+   "x_km": 421,
+   "y_km": 6441
+  },
+  {
+   "name": "LHD_FXX_0421_6442_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 77935333,
+   "x_km": 421,
+   "y_km": 6442
+  },
+  {
+   "name": "LHD_FXX_0421_6443_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 56148011,
+   "x_km": 421,
+   "y_km": 6443
+  },
+  {
+   "name": "LHD_FXX_0422_6414_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 111381998,
+   "x_km": 422,
+   "y_km": 6414
+  },
+  {
+   "name": "LHD_FXX_0422_6415_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 81264887,
+   "x_km": 422,
+   "y_km": 6415
+  },
+  {
+   "name": "LHD_FXX_0422_6416_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 102433303,
+   "x_km": 422,
+   "y_km": 6416
+  },
+  {
+   "name": "LHD_FXX_0422_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 118587615,
+   "x_km": 422,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0422_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 119198095,
+   "x_km": 422,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0422_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 130193726,
+   "x_km": 422,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0422_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 161395996,
+   "x_km": 422,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0422_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 131861611,
+   "x_km": 422,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0422_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 106081122,
+   "x_km": 422,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0422_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 98443208,
+   "x_km": 422,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0422_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 100250894,
+   "x_km": 422,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0422_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 99680674,
+   "x_km": 422,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0422_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 104161243,
+   "x_km": 422,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0422_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 100782363,
+   "x_km": 422,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0422_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 109269876,
+   "x_km": 422,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0422_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 89603721,
+   "x_km": 422,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0422_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 109143207,
+   "x_km": 422,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0422_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 88043572,
+   "x_km": 422,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0422_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 108630184,
+   "x_km": 422,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0422_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 85387395,
+   "x_km": 422,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0422_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 134559994,
+   "x_km": 422,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0422_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 79561045,
+   "x_km": 422,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0422_6437_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 74299124,
+   "x_km": 422,
+   "y_km": 6437
+  },
+  {
+   "name": "LHD_FXX_0422_6438_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 88390907,
+   "x_km": 422,
+   "y_km": 6438
+  },
+  {
+   "name": "LHD_FXX_0422_6439_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 104072272,
+   "x_km": 422,
+   "y_km": 6439
+  },
+  {
+   "name": "LHD_FXX_0422_6440_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 78663077,
+   "x_km": 422,
+   "y_km": 6440
+  },
+  {
+   "name": "LHD_FXX_0422_6441_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 67885851,
+   "x_km": 422,
+   "y_km": 6441
+  },
+  {
+   "name": "LHD_FXX_0422_6442_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 52646095,
+   "x_km": 422,
+   "y_km": 6442
+  },
+  {
+   "name": "LHD_FXX_0423_6418_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 136896688,
+   "x_km": 423,
+   "y_km": 6418
+  },
+  {
+   "name": "LHD_FXX_0423_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 130738525,
+   "x_km": 423,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0423_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 131461057,
+   "x_km": 423,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0423_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 160430344,
+   "x_km": 423,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0423_6422_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 107880006,
+   "x_km": 423,
+   "y_km": 6422
+  },
+  {
+   "name": "LHD_FXX_0423_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 102360160,
+   "x_km": 423,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0423_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 105861662,
+   "x_km": 423,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0423_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 117647637,
+   "x_km": 423,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0423_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 99430724,
+   "x_km": 423,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0423_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 135691408,
+   "x_km": 423,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0423_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 102025463,
+   "x_km": 423,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0423_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 105971185,
+   "x_km": 423,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0423_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 96287178,
+   "x_km": 423,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0423_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 115183769,
+   "x_km": 423,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0423_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 99983679,
+   "x_km": 423,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0423_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 108922727,
+   "x_km": 423,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0423_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 106140142,
+   "x_km": 423,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0423_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 131753608,
+   "x_km": 423,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0423_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 104469613,
+   "x_km": 423,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0423_6437_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 75008200,
+   "x_km": 423,
+   "y_km": 6437
+  },
+  {
+   "name": "LHD_FXX_0423_6438_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 69813962,
+   "x_km": 423,
+   "y_km": 6438
+  },
+  {
+   "name": "LHD_FXX_0423_6439_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 69207972,
+   "x_km": 423,
+   "y_km": 6439
+  },
+  {
+   "name": "LHD_FXX_0423_6440_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 62430519,
+   "x_km": 423,
+   "y_km": 6440
+  },
+  {
+   "name": "LHD_FXX_0423_6441_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 54164614,
+   "x_km": 423,
+   "y_km": 6441
+  },
+  {
+   "name": "LHD_FXX_0424_6419_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 124752802,
+   "x_km": 424,
+   "y_km": 6419
+  },
+  {
+   "name": "LHD_FXX_0424_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 151286798,
+   "x_km": 424,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0424_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 123264917,
+   "x_km": 424,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0424_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 117889691,
+   "x_km": 424,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0424_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 110061393,
+   "x_km": 424,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0424_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 124426926,
+   "x_km": 424,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0424_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 104004611,
+   "x_km": 424,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0424_6427_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 143252823,
+   "x_km": 424,
+   "y_km": 6427
+  },
+  {
+   "name": "LHD_FXX_0424_6428_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 110443040,
+   "x_km": 424,
+   "y_km": 6428
+  },
+  {
+   "name": "LHD_FXX_0424_6429_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 109466180,
+   "x_km": 424,
+   "y_km": 6429
+  },
+  {
+   "name": "LHD_FXX_0424_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 87437470,
+   "x_km": 424,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0424_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 129728096,
+   "x_km": 424,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0424_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 106807862,
+   "x_km": 424,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0424_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 111211153,
+   "x_km": 424,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0424_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 103372658,
+   "x_km": 424,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0424_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 167484230,
+   "x_km": 424,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0424_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 111623052,
+   "x_km": 424,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0424_6437_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 110951358,
+   "x_km": 424,
+   "y_km": 6437
+  },
+  {
+   "name": "LHD_FXX_0424_6438_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 108710611,
+   "x_km": 424,
+   "y_km": 6438
+  },
+  {
+   "name": "LHD_FXX_0424_6439_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 91087811,
+   "x_km": 424,
+   "y_km": 6439
+  },
+  {
+   "name": "LHD_FXX_0424_6440_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 63781556,
+   "x_km": 424,
+   "y_km": 6440
+  },
+  {
+   "name": "LHD_FXX_0424_6441_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 55576021,
+   "x_km": 424,
+   "y_km": 6441
+  },
+  {
+   "name": "LHD_FXX_0425_6420_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 138136340,
+   "x_km": 425,
+   "y_km": 6420
+  },
+  {
+   "name": "LHD_FXX_0425_6421_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 110045518,
+   "x_km": 425,
+   "y_km": 6421
+  },
+  {
+   "name": "LHD_FXX_0425_6423_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 112954239,
+   "x_km": 425,
+   "y_km": 6423
+  },
+  {
+   "name": "LHD_FXX_0425_6424_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 104593963,
+   "x_km": 425,
+   "y_km": 6424
+  },
+  {
+   "name": "LHD_FXX_0425_6425_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 127036575,
+   "x_km": 425,
+   "y_km": 6425
+  },
+  {
+   "name": "LHD_FXX_0425_6426_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 102451666,
+   "x_km": 425,
+   "y_km": 6426
+  },
+  {
+   "name": "LHD_FXX_0425_6430_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 99072695,
+   "x_km": 425,
+   "y_km": 6430
+  },
+  {
+   "name": "LHD_FXX_0425_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 112110931,
+   "x_km": 425,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0425_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 97413884,
+   "x_km": 425,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0425_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 110002244,
+   "x_km": 425,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0425_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 173628620,
+   "x_km": 425,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0425_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 318168340,
+   "x_km": 425,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0425_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 151225780,
+   "x_km": 425,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0425_6437_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 95961844,
+   "x_km": 425,
+   "y_km": 6437
+  },
+  {
+   "name": "LHD_FXX_0425_6438_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 101790918,
+   "x_km": 425,
+   "y_km": 6438
+  },
+  {
+   "name": "LHD_FXX_0425_6439_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 68817434,
+   "x_km": 425,
+   "y_km": 6439
+  },
+  {
+   "name": "LHD_FXX_0425_6440_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 68159499,
+   "x_km": 425,
+   "y_km": 6440
+  },
+  {
+   "name": "LHD_FXX_0426_6431_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 95075200,
+   "x_km": 426,
+   "y_km": 6431
+  },
+  {
+   "name": "LHD_FXX_0426_6432_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 103439279,
+   "x_km": 426,
+   "y_km": 6432
+  },
+  {
+   "name": "LHD_FXX_0426_6433_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_FN_2025-07-29",
+   "bytes": 113600011,
+   "x_km": 426,
+   "y_km": 6433
+  },
+  {
+   "name": "LHD_FXX_0426_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 129287061,
+   "x_km": 426,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0426_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 179913295,
+   "x_km": 426,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0426_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 107538993,
+   "x_km": 426,
+   "y_km": 6436
+  },
+  {
+   "name": "LHD_FXX_0426_6437_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 66253622,
+   "x_km": 426,
+   "y_km": 6437
+  },
+  {
+   "name": "LHD_FXX_0426_6438_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 67484048,
+   "x_km": 426,
+   "y_km": 6438
+  },
+  {
+   "name": "LHD_FXX_0426_6439_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 67034258,
+   "x_km": 426,
+   "y_km": 6439
+  },
+  {
+   "name": "LHD_FXX_0426_6440_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 81565828,
+   "x_km": 426,
+   "y_km": 6440
+  },
+  {
+   "name": "LHD_FXX_0427_6434_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 98691974,
+   "x_km": 427,
+   "y_km": 6434
+  },
+  {
+   "name": "LHD_FXX_0427_6435_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 124341057,
+   "x_km": 427,
+   "y_km": 6435
+  },
+  {
+   "name": "LHD_FXX_0427_6436_PTS_LAMB93_IGN69.copc.laz",
+   "block": "NUALHD_1-0__LAZ_LAMB93_EM_2025-07-01",
+   "bytes": 96793848,
+   "x_km": 427,
+   "y_km": 6436
+  }
+ ]
+}
