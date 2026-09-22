@@ -53,14 +53,31 @@ them the upload checkbox stays disabled.
 
 ### Windows executable (no Python installation needed)
 
-Download `lidar-hd-windows-x64.zip` and `SHA256SUMS.txt` from a GitHub release.
-The package is Windows x64 only and includes Python and its dependencies.
-In PowerShell, from the download directory, verify the checksum and extract:
+Choose from the assets on a GitHub release (both include Python and dependencies):
+
+- **Installer:** `lidar-hd-windows-x64-setup.exe` installs for your Windows user,
+  without administrator rights, under `%LOCALAPPDATA%\Programs\LiDAR HD`.
+  It adds a Start menu shortcut, an optional desktop shortcut and a Windows
+  installed-apps uninstaller. Upgrades use the same location; uninstalling leaves
+  your `.env` and downloaded `data` intact. No system PATH changes are made.
+- **Portable:** `lidar-hd-windows-x64.zip` needs no installation.
+
+Download `SHA256SUMS.txt` too. In PowerShell, verify your chosen file before
+running the installer or extracting the ZIP:
 
 ```powershell
-$expected = ((Get-Content .\SHA256SUMS.txt -Raw).Trim() -split '\s+')[0]
-$actual = (Get-FileHash .\lidar-hd-windows-x64.zip -Algorithm SHA256).Hash
+$asset = 'lidar-hd-windows-x64-setup.exe' # Or lidar-hd-windows-x64.zip
+$line = Get-Content .\SHA256SUMS.txt | Where-Object { ($_ -split '\s+', 2)[1] -eq $asset }
+if (@($line).Count -ne 1) { throw 'Missing or duplicate checksum entry' }
+$expected = ($line -split '\s+', 2)[0]
+$actual = (Get-FileHash $asset -Algorithm SHA256).Hash
 if ($actual -ne $expected) { throw 'SHA256 checksum mismatch' }
+& .\lidar-hd-windows-x64-setup.exe
+```
+
+For the portable ZIP instead:
+
+```powershell
 Expand-Archive .\lidar-hd-windows-x64.zip -DestinationPath .\lidar-hd-release
 Set-Location .\lidar-hd-release\lidar-hd
 & .\lidar-hd.exe --help
@@ -101,6 +118,10 @@ available. In that case, run from a Developer PowerShell with the x64 compiler
 environment enabled. The GitHub Windows runner provides these tools and the
 workflow enables them.
 
+For the installer, also install **Inno Setup 6** (6.3 or newer). The GitHub
+Windows runner already includes it. The build script discovers `ISCC.exe`, or
+accepts `--compiler 'C:\path\to\ISCC.exe'` / `INNO_SETUP_COMPILER`.
+
 From the repository root, use PowerShell:
 
 ```powershell
@@ -114,23 +135,37 @@ if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
 if ($LASTEXITCODE -ne 0) { throw 'Frozen self-test failed' }
 & .\dist\lidar-hd\lidar-hd.exe --help
 if ($LASTEXITCODE -ne 0) { throw 'Frozen help failed' }
+uv run --frozen --group build python scripts\build_installer.py --version v0.1.0
+if ($LASTEXITCODE -ne 0) { throw 'Installer build failed' }
 New-Item -ItemType Directory -Path artifacts -Force | Out-Null
 uv run --frozen --group build python -m zipfile -c artifacts\lidar-hd-windows-x64.zip dist\lidar-hd
 if ($LASTEXITCODE -ne 0) { throw 'Archive creation failed' }
-$hash = (Get-FileHash artifacts\lidar-hd-windows-x64.zip -Algorithm SHA256).Hash.ToLowerInvariant()
-"$hash  lidar-hd-windows-x64.zip" | Set-Content artifacts\SHA256SUMS.txt -Encoding ascii
+$assets = @('lidar-hd-windows-x64.zip', 'lidar-hd-windows-x64-setup.exe')
+$assets | ForEach-Object {
+    $hash = (Get-FileHash "artifacts\$_" -Algorithm SHA256).Hash.ToLowerInvariant()
+    "$hash  $_"
+} | Set-Content artifacts\SHA256SUMS.txt -Encoding ascii
 ```
+
+The installer version defaults to `pyproject.toml` locally; tagged builds use
+the `vMAJOR.MINOR.PATCH` tag (for example `v0.1.0`). On a clean Windows machine,
+`uv run --frozen --group build python scripts\test_installer.py` tests silent
+installation, the installed executable, upgrade and uninstall, including data
+and configuration preservation. It refuses to replace an existing installation.
 
 The spec explicitly includes only the documentation and configuration example
 as application data, never your `.env` or `data` directory. Package a fresh
 build before running real downloads or adding credentials to `dist\lidar-hd`.
-Distribute the ZIP and checksum file, not a standalone executable.
+Distribute the setup executable or the ZIP, plus the checksum file; never
+distribute the inner application executable alone. The installer only includes
+the application executable and `_internal`, not adjacent personal files.
 
 ### Publish a GitHub release
 
 The **Windows release** workflow installs locked dependencies, runs tests,
-builds and smoke-tests the frozen application, then uploads only the ZIP and
-`SHA256SUMS.txt`. Use **Run workflow** in GitHub Actions for a manual build:
+builds and smoke-tests the frozen application and installer, then uploads the
+setup executable, portable ZIP and `SHA256SUMS.txt`.
+Use **Run workflow** in GitHub Actions for a manual build:
 manual runs produce workflow artifacts only, even when a tag is selected.
 
 To publish, first commit and push the intended code, including `uv.lock` and
@@ -144,7 +179,7 @@ git push origin v0.1.0
 
 Only pushes of `v*` tags publish releases. A separate job with repository
 contents write permission verifies the tag and creates the release with
-generated notes. Rerunning an existing tag's workflow replaces the two assets
+generated notes. Rerunning an existing tag's workflow replaces the three assets
 on that release; ordinary branch pushes and manual runs do not publish.
 
 ## Command line

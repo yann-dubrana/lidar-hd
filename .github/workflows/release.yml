@@ -37,19 +37,36 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "Frozen self-test failed: $LASTEXITCODE" }
           & .\dist\lidar-hd\lidar-hd.exe --help
           if ($LASTEXITCODE -ne 0) { throw "Frozen help failed: $LASTEXITCODE" }
+      - name: Build Windows installer
+        env:
+          RELEASE_REF: ${{ github.ref_name }}
+          RELEASE_REF_TYPE: ${{ github.ref_type }}
+        run: |
+          $compiler = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $compiler)) { throw 'Inno Setup 6 is missing from the runner' }
+          $versionArgs = @()
+          if ($env:RELEASE_REF_TYPE -eq 'tag') { $versionArgs = @('--version', $env:RELEASE_REF) }
+          uv run --frozen --group build python scripts\build_installer.py --compiler $compiler @versionArgs
+          if ($LASTEXITCODE -ne 0) { throw "Installer build failed: $LASTEXITCODE" }
+      - name: Test installation, upgrade and uninstallation
+        run: uv run --frozen --group build python scripts\test_installer.py
       - name: Package the entire application folder
         run: |
           New-Item -ItemType Directory -Path artifacts -Force | Out-Null
           uv run --frozen --group build python -m zipfile -c artifacts\lidar-hd-windows-x64.zip dist\lidar-hd
           if ($LASTEXITCODE -ne 0) { throw "Archive creation failed: $LASTEXITCODE" }
-          $hash = (Get-FileHash artifacts\lidar-hd-windows-x64.zip -Algorithm SHA256).Hash.ToLowerInvariant()
-          "$hash  lidar-hd-windows-x64.zip" | Set-Content artifacts\SHA256SUMS.txt -Encoding ascii
+          $assets = @('lidar-hd-windows-x64.zip', 'lidar-hd-windows-x64-setup.exe')
+          $assets | ForEach-Object {
+            $hash = (Get-FileHash "artifacts\$_" -Algorithm SHA256).Hash.ToLowerInvariant()
+            "$hash  $_"
+          } | Set-Content artifacts\SHA256SUMS.txt -Encoding ascii
       - name: Upload release assets
         uses: actions/upload-artifact@v4
         with:
           name: lidar-hd-windows-x64
           path: |
             artifacts/lidar-hd-windows-x64.zip
+            artifacts/lidar-hd-windows-x64-setup.exe
             artifacts/SHA256SUMS.txt
           if-no-files-found: error
 
@@ -72,7 +89,7 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" artifacts/lidar-hd-windows-x64.zip artifacts/SHA256SUMS.txt --clobber
+            gh release upload "$RELEASE_TAG" artifacts/lidar-hd-windows-x64.zip artifacts/lidar-hd-windows-x64-setup.exe artifacts/SHA256SUMS.txt --clobber
           else
-            gh release create "$RELEASE_TAG" artifacts/lidar-hd-windows-x64.zip artifacts/SHA256SUMS.txt --verify-tag --generate-notes
+            gh release create "$RELEASE_TAG" artifacts/lidar-hd-windows-x64.zip artifacts/lidar-hd-windows-x64-setup.exe artifacts/SHA256SUMS.txt --verify-tag --generate-notes
           fi
