@@ -16,3 +16,8 @@ dependencies = [
     "rasterio>=1.5.1",
     "pmtiles>=3.8.1",
 ]
+
+[dependency-groups]
+build = [
+    "pyinstaller>=6.19,<7",
+]

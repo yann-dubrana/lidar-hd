@@ -280,7 +280,9 @@ def convert_3dtiles(inputs: Iterable[Path], out_dir: Path,
     if out_dir.exists():
         shutil.rmtree(out_dir)
 
-    cmd = [str(py3dtiles_exe()), "convert", *[str(p) for p in inputs],
+    cmd = ([sys.executable, "--internal-py3dtiles"] if getattr(sys, "frozen", False)
+           else [str(py3dtiles_exe())])
+    cmd += ["convert", *[str(p) for p in inputs],
            "--out", str(out_dir),
            "--srs_in", str(LAMBERT93), "--srs_out", str(ECEF)]
     if keep_classification:

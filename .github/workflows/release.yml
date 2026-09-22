@@ -1,0 +1,78 @@
+name: Windows release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-2022
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up uv and Python 3.14
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: '3.14'
+      - name: Enable the x64 native compiler toolchain
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Install locked dependencies
+        run: uv sync --frozen --group build --python 3.14
+      - name: Run tests
+        run: uv run --frozen --group build python -m unittest discover -s tests
+      - name: Build Windows console application
+        run: uv run --frozen --group build pyinstaller --noconfirm --clean lidar-hd.spec
+      - name: Smoke-test the frozen application
+        run: |
+          & .\dist\lidar-hd\lidar-hd.exe --self-test
+          if ($LASTEXITCODE -ne 0) { throw "Frozen self-test failed: $LASTEXITCODE" }
+          & .\dist\lidar-hd\lidar-hd.exe --help
+          if ($LASTEXITCODE -ne 0) { throw "Frozen help failed: $LASTEXITCODE" }
+      - name: Package the entire application folder
+        run: |
+          New-Item -ItemType Directory -Path artifacts -Force | Out-Null
+          uv run --frozen --group build python -m zipfile -c artifacts\lidar-hd-windows-x64.zip dist\lidar-hd
+          if ($LASTEXITCODE -ne 0) { throw "Archive creation failed: $LASTEXITCODE" }
+          $hash = (Get-FileHash artifacts\lidar-hd-windows-x64.zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  lidar-hd-windows-x64.zip" | Set-Content artifacts\SHA256SUMS.txt -Encoding ascii
+      - name: Upload release assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: lidar-hd-windows-x64
+          path: |
+            artifacts/lidar-hd-windows-x64.zip
+            artifacts/SHA256SUMS.txt
+          if-no-files-found: error
+
+  release:
+    needs: build
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download release assets
+        uses: actions/download-artifact@v4
+        with:
+          name: lidar-hd-windows-x64
+          path: artifacts
+      - name: Publish or update the tagged release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" artifacts/lidar-hd-windows-x64.zip artifacts/SHA256SUMS.txt --clobber
+          else
+            gh release create "$RELEASE_TAG" artifacts/lidar-hd-windows-x64.zip artifacts/SHA256SUMS.txt --verify-tag --generate-notes
+          fi

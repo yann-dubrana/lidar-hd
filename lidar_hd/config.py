@@ -6,12 +6,24 @@ can still be overridden by an environment variable.
 from __future__ import annotations
 
 import os
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+
+def application_root() -> Path:
+    """Writable portable directory, never PyInstaller's internal resources."""
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent
+    return Path(__file__).resolve().parent.parent
+
+
 try:
     from dotenv import load_dotenv
-    load_dotenv()
+    if getattr(sys, "frozen", False):
+        load_dotenv(application_root() / ".env", override=False)
+    else:
+        load_dotenv()
 except ImportError:                     # python-dotenv is optional
     pass
 
@@ -85,11 +97,10 @@ def minio_config() -> MinioConfig:
 def data_root() -> Path:
     """Where downloads and derived data land.
 
-    Defaults to a `data/` directory beside the project so the app keeps working
-    wherever it is checked out; override with LIDARHD_DATA to put the (large)
-    output on another drive.
+    Defaults to `data/` beside the project (or the frozen executable).
+    Override with LIDARHD_DATA to put the (large) output on another drive.
     """
     env = os.getenv("LIDARHD_DATA")
     if env:
         return Path(env)
-    return Path(__file__).resolve().parent.parent / "data"
+    return application_root() / "data"

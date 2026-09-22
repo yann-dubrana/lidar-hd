@@ -51,6 +51,102 @@ Windows anyway.
 For uploads, copy `.env.example` to `.env` and fill in the MinIO keys. Without
 them the upload checkbox stays disabled.
 
+### Windows executable (no Python installation needed)
+
+Download `lidar-hd-windows-x64.zip` and `SHA256SUMS.txt` from a GitHub release.
+The package is Windows x64 only and includes Python and its dependencies.
+In PowerShell, from the download directory, verify the checksum and extract:
+
+```powershell
+$expected = ((Get-Content .\SHA256SUMS.txt -Raw).Trim() -split '\s+')[0]
+$actual = (Get-FileHash .\lidar-hd-windows-x64.zip -Algorithm SHA256).Hash
+if ($actual -ne $expected) { throw 'SHA256 checksum mismatch' }
+Expand-Archive .\lidar-hd-windows-x64.zip -DestinationPath .\lidar-hd-release
+Set-Location .\lidar-hd-release\lidar-hd
+& .\lidar-hd.exe --help
+& .\lidar-hd.exe
+```
+
+Extract and keep the **entire folder**, including `_internal`; do not copy just
+`lidar-hd.exe`. This is a PyInstaller **onedir console** application: run it in
+a terminal to use the TUI or pass the same CLI options shown below in place of
+`python main.py`. Use a writable location for the extracted folder.
+The executable is unsigned, so Windows SmartScreen may warn about an unknown
+publisher. Only run a release you trust; checksums detect corruption, not publisher
+identity.
+
+The packaged `README.md` and `.env.example` are under `_internal`. For uploads,
+copy the example next to the executable and edit your credentials:
+
+```powershell
+Copy-Item .\_internal\.env.example .\.env
+notepad .\.env
+```
+
+The frozen application loads `.env` **only beside `lidar-hd.exe`**, not from the
+current working directory or `_internal`. Existing environment variables take
+precedence over `.env`. Data defaults to `data` beside the executable; set
+`LIDARHD_DATA` to choose another location. Personal `.env` files and downloaded
+data are never included in the package. Conversion uses the bundled runtime
+through the internal `--internal-py3dtiles` entry point, not a system Python;
+that switch is not intended for normal use.
+
+### Build the Windows package
+
+Build on **Windows x64** with `uv` installed; PyInstaller does not cross-compile
+this package from Linux or macOS. Python 3.14 is managed by `uv`. Native
+dependencies may require Visual Studio 2022 Build Tools with the **Desktop
+development with C++** workload and Windows SDK when no compatible wheel is
+available. In that case, run from a Developer PowerShell with the x64 compiler
+environment enabled. The GitHub Windows runner provides these tools and the
+workflow enables them.
+
+From the repository root, use PowerShell:
+
+```powershell
+uv sync --frozen --group build --python 3.14
+if ($LASTEXITCODE -ne 0) { throw 'Dependency installation failed' }
+uv run --frozen --group build python -m unittest discover -s tests
+if ($LASTEXITCODE -ne 0) { throw 'Tests failed' }
+uv run --frozen --group build pyinstaller --noconfirm --clean lidar-hd.spec
+if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
+& .\dist\lidar-hd\lidar-hd.exe --self-test
+if ($LASTEXITCODE -ne 0) { throw 'Frozen self-test failed' }
+& .\dist\lidar-hd\lidar-hd.exe --help
+if ($LASTEXITCODE -ne 0) { throw 'Frozen help failed' }
+New-Item -ItemType Directory -Path artifacts -Force | Out-Null
+uv run --frozen --group build python -m zipfile -c artifacts\lidar-hd-windows-x64.zip dist\lidar-hd
+if ($LASTEXITCODE -ne 0) { throw 'Archive creation failed' }
+$hash = (Get-FileHash artifacts\lidar-hd-windows-x64.zip -Algorithm SHA256).Hash.ToLowerInvariant()
+"$hash  lidar-hd-windows-x64.zip" | Set-Content artifacts\SHA256SUMS.txt -Encoding ascii
+```
+
+The spec explicitly includes only the documentation and configuration example
+as application data, never your `.env` or `data` directory. Package a fresh
+build before running real downloads or adding credentials to `dist\lidar-hd`.
+Distribute the ZIP and checksum file, not a standalone executable.
+
+### Publish a GitHub release
+
+The **Windows release** workflow installs locked dependencies, runs tests,
+builds and smoke-tests the frozen application, then uploads only the ZIP and
+`SHA256SUMS.txt`. Use **Run workflow** in GitHub Actions for a manual build:
+manual runs produce workflow artifacts only, even when a tag is selected.
+
+To publish, first commit and push the intended code, including `uv.lock` and
+`lidar-hd.spec`, then create and push a new version tag (replace the example
+version with your release version):
+
+```powershell
+git tag -a v0.1.0 -m "Release v0.1.0"
+git push origin v0.1.0
+```
+
+Only pushes of `v*` tags publish releases. A separate job with repository
+contents write permission verifies the tag and creates the release with
+generated notes. Rerunning an existing tag's workflow replaces the two assets
+on that release; ordinary branch pushes and manual runs do not publish.
+
 ## Command line
 
     python main.py --level commune --name Pessac --estimate-only
@@ -126,7 +222,8 @@ Network/server limits still apply; a speed-up is not guaranteed.
 | convert | `.../3dtiles/` | one tileset over the whole area |
 | upload | `<bucket>/<prefix>/<level>-<code>/<output>/` | keeps `3dtiles/`, `raw/` or `colorized/`, and `ortho/` separate |
 
-Data lands under `LIDARHD_DATA`, defaulting to `data/` beside the project.
+Data lands under `LIDARHD_DATA`, defaulting to `data/` beside the project when
+running from source, or beside `lidar-hd.exe` in the Windows package.
 
 ## Orthophoto basemap
 

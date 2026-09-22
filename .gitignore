@@ -4,3 +4,7 @@ __pycache__/
 data/
 catalog.json
 .idea
+.venv/
+build/
+dist/
+artifacts/
