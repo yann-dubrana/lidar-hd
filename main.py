@@ -93,12 +93,13 @@ class LidarApp(App):
         yield Header()
         with VerticalScroll(id="workspace"):
             with Horizontal(id="top"):
-                with Vertical(id="navigation", classes="pane"):
+                with VerticalScroll(id="navigation", classes="pane"):
                     yield Label("EXPLORE", classes="eyebrow")
                     with RadioSet(id="level"):
                         yield RadioButton("Region", value=True, id="region")
                         yield RadioButton("Department", id="departement")
                         yield RadioButton("Commune", id="commune")
+                        yield RadioButton("EPCI", id="epci", tooltip="Intercommunalities: communautés de communes, agglomérations, métropoles")
                     yield Static("IGN LiDAR HD\nFrance · 1 km tiles", classes="dim", id="source-note")
                     yield Static("↑ ↓  Browse\nSpace  Toggle\nEnter  Toggle\n/  Search\nTab  Next pane", classes="dim", id="key-guide")
                 with Vertical(id="browser", classes="pane"):
@@ -112,6 +113,10 @@ class LidarApp(App):
                         yield Static("0 areas selected", id="selection-count")
                         yield Static("Selections stay while you search.", id="selected-areas", markup=False)
                         yield Button("Clear selection", id="clear-selection")
+                        with Vertical(id="batch-options"):
+                            yield Checkbox("Merge selection", id="merge")
+                            yield Input(placeholder="Zone name, e.g. La CUB", id="zone-name", disabled=True)
+                            yield Static("Separate outputs for each area.", id="output-note", classes="dim", markup=False)
                         yield Static("Choose an area\n\nSelect a place from the list to see its tile count and storage estimate.", id="summary")
                         yield Label("PIPELINE", classes="eyebrow")
                         yield Static("Unchecked stages reuse existing files.", classes="dim")
@@ -121,6 +126,8 @@ class LidarApp(App):
                             yield Checkbox("Export ortho PMTiles", id="do_ortho")
                             yield Checkbox("Convert to 3D Tiles", id="do_tiles")
                             yield Checkbox("Upload to MinIO", id="do_upload")
+                            yield Checkbox("Group small uploads (TAR)", id="do_snowball", disabled=True,
+                                           tooltip="MinIO Snowball extraction required. Large files and PMTiles use normal upload.")
                             yield Checkbox("Clean intermediates", id="do_clean", value=True)
                         yield Static("", id="upload-note", classes="dim")
                     with Horizontal(id="actions"):
@@ -189,7 +196,26 @@ class LidarApp(App):
         self.query_one("#selection-count", Static).update(f"{count} areas selected{suffix}")
         self.query_one("#selected-areas", Static).update(
             " · ".join(a.name for a in self._selection.values()) or "Selections stay while you search.")
-        self.query_one("#run", Button).disabled = self._run_lock.is_set() or not count or bool(pending) or not self.options().stages
+        merging = self.query_one("#merge", Checkbox).value
+        self.query_one("#zone-name", Input).disabled = not merging
+        upload = self.query_one("#do_upload", Checkbox)
+        self.query_one("#do_snowball", Checkbox).disabled = not upload.value or upload.disabled
+        valid = True
+        note = "Separate outputs for each area."
+        if merging:
+            try:
+                code = jobs.zone_code(self.query_one("#zone-name", Input).value)
+                tiles = {t for _, coverage in self._prepared.values() for t in coverage}
+                note = f"zone-{code}/ · {len(tiles)} unique tiles"
+                if pending:
+                    note += " (waiting for estimates)"
+                elif tiles:
+                    note += f" · ≈ {pipeline.human(pipeline.estimate(len(tiles)).raw_bytes)} raw"
+            except ValueError as e:
+                note, valid = str(e), False
+        self.query_one("#output-note", Static).update(note)
+        self.query_one("#run", Button).disabled = (self._run_lock.is_set() or not count or bool(pending)
+                                                   or not self.options().stages or not valid)
         table = self.query_one("#results", DataTable)
         for row, area in enumerate(self.found):
             if row < table.row_count:
@@ -207,11 +233,16 @@ class LidarApp(App):
     def options_changed(self) -> None:
         self.refresh_selection()
 
+    @on(Input.Changed, "#zone-name")
+    def zone_name_changed(self) -> None:
+        self.refresh_selection()
+
     def options(self) -> jobs.Options:
         return jobs.Options(**{stage: self.query_one(f"#do_{suffix}", Checkbox).value
                                for stage, suffix in (("download", "download"), ("colorize", "color"),
                                                      ("ortho", "ortho"), ("convert", "tiles"),
-                                                     ("upload", "upload"), ("cleanup", "clean"))})
+                                                     ("upload", "upload"), ("cleanup", "clean"),
+                                                     ("snowball", "snowball"))})
 
     @on(RadioSet.Changed, "#level")
     def change_level(self) -> None:
@@ -220,6 +251,7 @@ class LidarApp(App):
         self.query_one("#term", Input).value = ""
         self.query_one("#term", Input).placeholder = (
             "Search communes, e.g. Pessac…" if self.level == "commune"
+            else "Filter EPCI, e.g. Bordeaux…" if self.level == "epci"
             else f"Filter {areas.LEVELS[self.level].lower()}s by name…")
         self.do_search()
 
@@ -249,7 +281,7 @@ class LidarApp(App):
         self.found = []
         self.query_one("#results", DataTable).clear()
         if self.level == "commune" and not term:
-            self.query_one("#results-status", Static).update("Type a commune name to search. Regions and departments can be browsed directly.")
+            self.query_one("#results-status", Static).update("Type a commune name to search. Regions, departments and EPCI can be browsed directly.")
             return
         self.query_one("#results-status", Static).update("Loading places…")
         if self.level in self._browse_cache:
@@ -365,20 +397,27 @@ class LidarApp(App):
         if (self._run_lock.is_set() or not self._selection or not options.stages
                 or len(self._prepared) != len(self._selection)):
             return
+        try:
+            batch = jobs.prepare_batch([self._prepared[key] for key in self._selection],
+                                       self.query_one("#zone-name", Input).value
+                                       if self.query_one("#merge", Checkbox).value else None)
+        except ValueError as e:
+            self.notify(str(e), severity="error")
+            return
         self._run_lock.set()
         self._stop.clear()
         self._stages = options.stages
-        self._batch_total = len(self._selection)
+        self._batch_total = len(batch)
         self._batch_index = 0
         self.query_one("#overall-progress", ProgressBar).update(total=100, progress=0)
         self.query_one("#download-progress", ProgressBar).update(total=100, progress=0)
         self.query_one("#download-label", Static).update("Waiting for download" if options.download else "Download not selected")
         self.query_one("#download-detail", Static).update("Current file · bytes received")
-        for selector in ("#level", "#term", "#search", "#results", "#opts", "#clear-selection"):
+        for selector in ("#level", "#term", "#search", "#results", "#opts", "#clear-selection", "#batch-options"):
             self.query_one(selector).disabled = True
         self.query_one("#run", Button).disabled = True
         self.query_one("#stop", Button).disabled = False
-        self.run_worker_thread([self._prepared[key] for key in self._selection], options)
+        self.run_worker_thread(batch, options)
 
     @on(Button.Pressed, "#stop")
     def action_stop(self) -> None:
@@ -396,7 +435,7 @@ class LidarApp(App):
         else:
             self.exit()
 
-    def begin_area(self, index: int, area: Area) -> None:
+    def begin_area(self, index: int, area: Area | jobs.NamedZone) -> None:
         self._batch_index = index
         self._batch_name = area.name
         self._stage_fractions = dict.fromkeys(self._stages, 0.0)
@@ -446,7 +485,7 @@ class LidarApp(App):
             self.refresh_overall()
 
     @work(thread=True, exclusive=True, group="pipeline")
-    def run_worker_thread(self, batch: list[tuple[Area, list[tuple[int, int]]]],
+    def run_worker_thread(self, batch: list[tuple[Area | jobs.NamedZone, list[tuple[int, int]]]],
                           options: jobs.Options) -> None:
         log = lambda s: self.call_from_thread(self.log_line, s)    # noqa: E731
 
@@ -479,7 +518,7 @@ class LidarApp(App):
 
     def _finish(self, failures: int = 0) -> None:
         self._run_lock.clear()
-        for selector in ("#level", "#term", "#search", "#results", "#opts", "#clear-selection"):
+        for selector in ("#level", "#term", "#search", "#results", "#opts", "#clear-selection", "#batch-options"):
             self.query_one(selector).disabled = False
         self.refresh_selection()
         self.query_one("#stop", Button).disabled = True
@@ -498,9 +537,10 @@ class LidarApp(App):
 def cli(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--level", choices=["commune", "departement", "region"],
+    ap.add_argument("--level", choices=list(areas.LEVELS),
                     help="administrative level")
     ap.add_argument("--name", action="append", help="area name (exact or prefix); repeat for a batch")
+    ap.add_argument("--merge-name", help="merge the selection into one named zone instead of separate outputs")
     ap.add_argument("--estimate-only", action="store_true",
                     help="print the estimate and exit")
     ap.add_argument("--color", action="store_true", help="colourise after download")
@@ -508,9 +548,19 @@ def cli(argv: list[str] | None = None) -> int:
     ap.add_argument("--no-download", action="store_true", help="reuse local inputs instead of downloading LiDAR")
     ap.add_argument("--tiles", action="store_true", help="convert to 3D Tiles")
     ap.add_argument("--upload", action="store_true", help="upload to MinIO")
+    ap.add_argument("--snowball", action="store_true", help="group small uploads into server-extracted TAR batches (MinIO only)")
     ap.add_argument("--no-clean", action="store_true",
                     help="keep raw/ and colorized/ after a successful run")
     args = ap.parse_args(argv)
+    if args.snowball and not args.upload:
+        ap.error("--snowball requires --upload")
+    if args.merge_name is not None:
+        try:
+            jobs.zone_code(args.merge_name)
+        except ValueError as e:
+            ap.error(str(e))
+        if not args.level or not args.name:
+            ap.error("--merge-name requires --level and --name")
 
     if not args.level or not args.name:
         LidarApp().run()
@@ -519,13 +569,14 @@ def cli(argv: list[str] | None = None) -> int:
     catalog = Catalog.load(data_root() / "catalog.json")
     options = jobs.Options(download=not args.no_download, colorize=args.color,
                            ortho=args.ortho, convert=args.tiles, upload=args.upload,
-                           cleanup=not args.no_clean)
+                           cleanup=not args.no_clean, snowball=args.snowball)
 
     def progress(stage: str, done: int, total: int, detail: str) -> None:
         print(f"[{stage} {done}/{total}] {detail}", flush=True)
 
     failed = False
     seen = set()
+    batch = []
     for name in args.name:
         try:
             found = areas.search(args.level, name)
@@ -545,17 +596,32 @@ def cli(argv: list[str] | None = None) -> int:
             print(f"  {len(tiles):,} tiles ≈ {h(est.raw_bytes)} raw (±8%)".replace(",", " "))
             print(f"  all LiDAR outputs: {h(est.total_bytes)}; ortho cache/PMTiles additional")
             print(f"  ~{est.download_hours:.1f} h download, ~{est.process_hours:.1f} h processing")
-            if args.estimate_only:
-                continue
             if not tiles:
                 raise ValueError("No tiles intersect this area")
+            batch.append((area, tiles))
+        except KeyboardInterrupt:
+            print("Stopped. Inputs kept.")
+            return 130
+        except Exception as e:                       # noqa: BLE001
+            print(f"FAILED {name}: {e}")
+            failed = True
+    if args.merge_name is not None and failed:
+        print("Merge cancelled: every selected area must resolve successfully.")
+        return 1
+    for area, tiles in jobs.prepare_batch(batch, args.merge_name):
+        if isinstance(area, jobs.NamedZone):
+            print(f"{area.label}: {len(tiles)} unique tiles, "
+                  f"≈ {pipeline.human(pipeline.estimate(len(tiles)).raw_bytes)} raw → zone-{area.code}/")
+        if args.estimate_only:
+            continue
+        try:
             results = jobs.run_area(area, tiles, data_root(), catalog, options, progress)
             failed |= any(result.failed for result in results.values())
         except KeyboardInterrupt:
             print("Stopped. Inputs kept.")
             return 130
         except Exception as e:                       # noqa: BLE001
-            print(f"FAILED {name}: {e}")
+            print(f"FAILED {area.name}: {e}")
             failed = True
     return 1 if failed else 0
 

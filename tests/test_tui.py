@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 
 from textual.app import App
-from textual.widgets import Button, Checkbox, DataTable, Input, ProgressBar, Static
+from textual.widgets import Button, Checkbox, DataTable, Input, ProgressBar, RadioButton, Static
 
 from lidar_hd.areas import Area
 from lidar_hd import pipeline
@@ -160,6 +160,57 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(app.query_one("#results", DataTable).row_count, 0)
             self.assertIn("No places", str(app.query_one("#results-status", Static).content))
 
+    async def test_named_merge_validation_and_single_job(self):
+        app = LidarApp()
+        with patch("main.jobs.run_area", return_value={}) as run:
+            async with app.run_test(size=(140, 44)) as pilot:
+                await self.ready(app, pilot)
+                app.query_one("#results", DataTable).focus()
+                await pilot.press("space", "down", "space")
+                await self.ready(app, pilot)
+                app.query_one("#merge", Checkbox).value = True
+                await pilot.pause()
+                self.assertTrue(app.query_one("#run", Button).disabled)
+                name = app.query_one("#zone-name", Input)
+                self.assertFalse(name.disabled)
+                name.value = "La CUB"
+                await pilot.pause()
+                self.assertFalse(app.query_one("#run", Button).disabled)
+                self.assertIn("1 unique tiles", str(app.query_one("#output-note", Static).content))
+                self.assertEqual(len(app._selection), 2)
+                app.action_run()
+                await self.ready(app, pilot)
+                run.assert_called_once()
+                self.assertEqual(run.call_args.args[0].code, "la-cub")
+                self.assertEqual(len(run.call_args.args[1]), 1)
+                self.assertEqual(app._batch_total, 1)
+                self.assertFalse(app.query_one("#batch-options").disabled)
+                app.query_one("#merge", Checkbox).value = False
+                await pilot.pause()
+                self.assertTrue(name.disabled)
+                self.assertIn("Separate", str(app.query_one("#output-note", Static).content))
+
+    async def test_epci_browsing_keeps_commune_selection(self):
+        app = LidarApp()
+        epci = Area("epci", "Bordeaux Métropole", "243300316")
+        async with app.run_test(size=(140, 44)) as pilot:
+            await self.ready(app, pilot)
+            app.query_one("#results", DataTable).focus()
+            await pilot.press("space")
+            await self.ready(app, pilot)
+            with patch("main.areas.browse", return_value=[epci]) as browse:
+                app.query_one("#epci", RadioButton).value = True
+                await self.ready(app, pilot)
+                browse.assert_called_with("epci")
+                app.query_one("#term", Input).value = "Bordeaux"
+                await pilot.pause(0.5)
+                app.query_one("#results", DataTable).focus()
+                await pilot.press("space")
+                await self.ready(app, pilot)
+            self.assertIn(("epci", "243300316"), app._prepared)
+            self.assertIn(("region", "53"), app._prepared)
+            self.assertEqual(len(app._selection), 2)
+
     async def test_actions_and_progress_stay_visible(self):
         app = LidarApp()
         async with app.run_test(size=(140, 44)) as pilot:
@@ -174,6 +225,38 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
 
 
 class CliTests(unittest.TestCase):
+    @patch("main.Catalog.load")
+    @patch("main.areas.geometry", return_value=GEOMETRY)
+    @patch("main.areas.search", side_effect=[[REGIONS[0]], [REGIONS[1]]])
+    @patch("main.jobs.run_area", return_value={})
+    def test_named_merge(self, run, search, geometry, catalog):
+        result = cli(["--level", "region", "--name", "Bretagne", "--name", "Nouvelle",
+                      "--merge-name", "La CUB", "--no-download", "--ortho", "--no-clean",
+                      "--upload", "--snowball"])
+        self.assertEqual(result, 0)
+        run.assert_called_once()
+        self.assertEqual(run.call_args.args[0].code, "la-cub")
+        self.assertEqual(len(run.call_args.args[1]), 1)
+        self.assertTrue(run.call_args.args[4].snowball)
+
+    @patch("main.Catalog.load")
+    @patch("main.areas.geometry", return_value=GEOMETRY)
+    @patch("main.areas.search", side_effect=[[REGIONS[0]], []])
+    @patch("main.jobs.run_area")
+    def test_incomplete_merge_does_not_run_partial_selection(self, run, search, geometry, catalog):
+        result = cli(["--level", "region", "--name", "Bretagne", "--name", "Missing",
+                      "--merge-name", "La CUB"])
+        self.assertEqual(result, 1)
+        run.assert_not_called()
+
+    @patch("main.Catalog.load")
+    @patch("main.areas.geometry", return_value=GEOMETRY)
+    @patch("main.areas.search", return_value=[REGIONS[0]])
+    @patch("main.jobs.run_area")
+    def test_merged_estimate_does_not_run(self, run, search, geometry, catalog):
+        self.assertEqual(cli(["--level", "region", "--name", "Bretagne",
+                              "--merge-name", "La CUB", "--estimate-only"]), 0)
+        run.assert_not_called()
     @patch("main.Catalog.load")
     @patch("main.areas.geometry", return_value=GEOMETRY)
     @patch("main.areas.search", side_effect=[[REGIONS[0]], [REGIONS[1]]])

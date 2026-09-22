@@ -9,7 +9,10 @@ import os
 import shutil
 import subprocess
 import sys
+import tarfile
+import tempfile
 import time
+from contextlib import closing
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Iterable
@@ -301,9 +304,26 @@ def convert_3dtiles(inputs: Iterable[Path], out_dir: Path,
 
 # --- stage 4: upload -------------------------------------------------------
 
+_SNOWBALL_MAX_BYTES = 128 * 1024 * 1024
+_SNOWBALL_MAX_FILES = 256
+_SNOWBALL_LARGE_FILE = 16 * 1024 * 1024
+
+
 def upload_dir(local: Path, prefix: str, cfg, progress: Progress = _noop,
-               should_stop: Callable[[], bool] = lambda: False) -> StageResult:
-    """Mirror a local directory into a MinIO bucket under `prefix`."""
+               should_stop: Callable[[], bool] = lambda: False, *,
+               snowball: bool = False) -> StageResult:
+    """Mirror a local directory into a MinIO bucket under `prefix`.
+
+    Snowball is opt-in and requires server-side TAR auto-extraction. Each TAR
+    is staged on disk, bounded to 128 MiB / 256 files including TAR overhead,
+    and sent with one PUT (SDK single-part limit: 5 GiB). MinIO Python 7.2.20
+    still buffers that PUT in memory. Files >= 16 MiB and PMTiles use normal
+    uploads. Extraction is checked by object size, not checksum; failure stops
+    batching without fallback or remote deletion. Cancellation is between PUTs.
+    Fewer PUTs may help small files, but TAR I/O and verification HEADs mean
+    performance gains are not guaranteed. Per-file MIME metadata is not carried
+    by the Snowball API; individual uploads retain their normal content types.
+    """
     from minio import Minio
 
     client = Minio(cfg.endpoint, access_key=cfg.access_key,
@@ -315,6 +335,12 @@ def upload_dir(local: Path, prefix: str, cfg, progress: Progress = _noop,
              and p.suffix not in (".part", ".tmp") and "tmp" not in p.relative_to(local).parts]
     res = StageResult()
     t0 = time.time()
+
+    if snowball:
+        _upload_snowball_dir(client, cfg.bucket, local, prefix, files, res,
+                             progress, should_stop)
+        res.seconds = time.time() - t0
+        return res
 
     for i, path in enumerate(files, 1):
         if should_stop():
@@ -342,6 +368,116 @@ def upload_dir(local: Path, prefix: str, cfg, progress: Progress = _noop,
 
     res.seconds = time.time() - t0
     return res
+
+
+def _snowball_tar_size(member_bytes: int) -> int:
+    # Two end blocks, then the record padding written by tarfile.close().
+    return ((member_bytes + 2 * tarfile.BLOCKSIZE + tarfile.RECORDSIZE - 1)
+            // tarfile.RECORDSIZE * tarfile.RECORDSIZE)
+
+
+def _upload_snowball_dir(client, bucket: str, local: Path, prefix: str,
+                         files: list[Path], res: StageResult, progress: Progress,
+                         should_stop: Callable[[], bool]) -> None:
+    from minio.commonconfig import SnowballObject
+
+    prefix = prefix.strip("/")
+    batch: list[tuple[Path, str, int]] = []
+    member_bytes = 0
+
+    def report(detail: str) -> None:
+        progress("upload", res.ok + res.skipped + len(res.failed), len(files), detail)
+
+    def objects():
+        for path, key, size in batch:
+            # Data sources make regular members even for symlinks/hardlinks,
+            # and fixed lengths keep growing source files within the TAR bound.
+            with path.open("rb") as data:
+                if os.fstat(data.fileno()).st_size != size:
+                    raise OSError(f"{key} changed while preparing Snowball TAR")
+                yield SnowballObject(key, data=data, length=size)
+
+    def flush() -> bool:
+        nonlocal member_bytes
+        if should_stop():
+            return False
+        if not batch:
+            return True
+        try:
+            with tempfile.TemporaryDirectory(prefix=".snowball-", dir=local) as staging:
+                with closing(objects()) as sources:
+                    client.upload_snowball_objects(
+                        bucket, sources, staging_filename=str(Path(staging) / "batch.tar"),
+                        compression=False)
+        except Exception as e:                    # noqa: BLE001
+            for _, key, _ in batch:
+                res.failed.append(key)
+                report(f"{key} FAILED Snowball upload/extraction required: {e}")
+            return False
+
+        verified = True
+        for _, key, size in batch:
+            try:
+                actual = client.stat_object(bucket, key).size
+                if actual != size:
+                    raise ValueError(f"expected {size} bytes, found {actual}")
+            except Exception as e:                # noqa: BLE001
+                verified = False
+                res.failed.append(key)
+                report(f"{key} FAILED Snowball extraction not verified "
+                       f"(server must support auto-extraction): {e}")
+            else:
+                res.ok += 1
+                res.bytes_moved += size
+                report(f"{key} {human(size)} (Snowball verified)")
+        batch.clear()
+        member_bytes = 0
+        return verified
+
+    for path in files:
+        if should_stop():
+            break
+        relative = path.relative_to(local).as_posix()
+        key = f"{prefix}/{relative}" if prefix else relative
+        try:
+            size = path.stat().st_size
+            try:
+                present = client.stat_object(bucket, key).size == size
+            except Exception:                     # noqa: BLE001 - not there yet
+                present = False
+            if present:
+                res.skipped += 1
+                report(f"{key} present")
+                continue
+
+            info = tarfile.TarInfo(key)
+            info.size = size
+            overhead = len(info.tobuf(format=tarfile.PAX_FORMAT))
+            entry_bytes = overhead + ((size + 511) // 512 * 512)
+            if (path.suffix.lower() == ".pmtiles" or size >= _SNOWBALL_LARGE_FILE
+                    or _snowball_tar_size(entry_bytes) > _SNOWBALL_MAX_BYTES):
+                if not flush() or should_stop():
+                    break
+                client.fput_object(bucket, key, str(path), content_type=_content_type(path))
+                res.ok += 1
+                res.bytes_moved += size
+                report(f"{key} {human(size)}")
+                continue
+
+            if batch and _snowball_tar_size(member_bytes + entry_bytes) > _SNOWBALL_MAX_BYTES:
+                if not flush():
+                    break
+            if should_stop():
+                break
+            batch.append((path, key, size))
+            member_bytes += entry_bytes
+            if len(batch) >= _SNOWBALL_MAX_FILES and not flush():
+                break
+        except Exception as e:                    # noqa: BLE001
+            res.failed.append(key)
+            report(f"{key} FAILED {e}")
+    else:
+        flush()
 
 
 # --- cleanup ---------------------------------------------------------------

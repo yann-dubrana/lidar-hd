@@ -1,15 +1,15 @@
 # lidarhd
 
-Download IGN LiDAR HD for French communes, departments or regions; optionally
+Download IGN LiDAR HD for French communes, intercommunalities (EPCI), departments or regions; optionally
 drape orthophoto colour, export a 20 cm raster basemap, convert to 3D Tiles,
 and mirror to MinIO.
 
     uv run python main.py
 
-Browse regions and departments immediately, or search communes by name.
+Browse regions, departments and EPCI immediately, or search communes by name.
 Use **Space** or **Enter** on a row to toggle it in the selection queue. Select
 multiple places, even across searches and administrative levels; they run
-sequentially, each in its own output directory. The estimate appears before
+sequentially, each in its own output directory by default. The estimate appears before
 anything is downloaded. **Clear selection** empties the queue.
 
 The roomier split-pane TUI keeps **Run** and **Stop** visible. **Ctrl+F** or
@@ -60,8 +60,61 @@ them the upload checkbox stays disabled.
     python main.py --level commune --name Pessac --no-download --ortho --no-clean
     python main.py --level commune --name Pessac --color --ortho --tiles --upload
     python main.py --level commune --name Pessac --no-download --tiles --no-clean
+    python main.py --level epci --name "Bordeaux Métropole" --estimate-only
+    python main.py --level commune --name Pessac --name Talence --merge-name "La CUB" --color --ortho --tiles --upload
+    python main.py --level epci --name "Bordeaux Métropole" --no-download --upload --snowball --no-clean
 
 Same code as the TUI, useful for scripting and for long unattended runs.
+
+## Separate outputs or a named merged zone
+
+Leave **Merge selection** unchecked to keep one output per selected area.
+Check it and enter a name such as **La CUB**, or use `--merge-name "La CUB"`,
+to process the union of the selected areas' 1 km tiles. Shared tiles are counted
+and processed only once. With the corresponding stages enabled, this creates
+one `3dtiles/tileset.json` and one `ortho/orthophoto.pmtiles`, locally under
+`<data>/zone-la-cub/` and remotely under `<bucket>/<prefix>/zone-la-cub/`.
+The selection panel shows the merged unique tile count and raw-data estimate.
+
+Names become portable slugs (for example, `Bordeaux Métropole` becomes
+`bordeaux-metropole`); paths and empty names are rejected. A local `zone.json`
+binds the output folder to its selection and tile coverage. To change either,
+choose another name rather than silently mixing old and new outputs.
+Fusion runs the pipeline on a combined input set; it does not concatenate
+existing 3D Tiles or PMTiles archives. With Download unchecked, inputs must
+already exist in the **merged zone's** directory, not individual city folders.
+As with individual exports, coverage follows tile footprints, not exact borders.
+
+EPCI includes communautés de communes, communautés d'agglomération and
+métropoles, so Bordeaux Métropole can be selected directly without manually
+choosing its member communes. Select several EPCI, or combine them with other
+levels in the TUI; named fusion removes overlapping tile coverage.
+Names, SIREN codes and contours come from the public
+[API Découpage administratif](https://geo.api.gouv.fr/decoupage-administratif/epcis).
+Contours are reprojected from WGS84 to Lambert-93 before finding LiDAR tiles.
+
+## Optional MinIO TAR batches
+
+Enable **Upload to MinIO** and **Group small uploads (TAR)**, or use
+`--upload --snowball`. Normal per-file uploads remain the default.
+This uses MinIO's Snowball server-side extraction protocol, **not a ZIP stored
+as an ordinary object**. Archive members carry the full destination keys so
+`tileset.json` and its referenced files remain individually addressable with
+the same directory layout as normal uploads. The TAR object's name is not
+the destination prefix.
+
+Use a MinIO server that supports Snowball extraction; a generic S3-compatible
+endpoint need not support it. Extraction is checked before reporting success.
+If it fails or is unsupported, the run reports errors and keeps local inputs;
+it does not silently switch upload modes or delete remote objects.
+Large files and PMTiles keep the normal upload path. Grouping targets the many
+small 3D Tiles files, not compression of already-compressed imagery. Temporary
+disk space is required for each TAR batch (at most 128 MiB or 256 files); the
+Python SDK also buffers the single PUT in memory. Files of 16 MiB or more and
+PMTiles are uploaded individually. Per-file MIME metadata is not carried by
+Snowball; use normal uploads if your serving setup requires those explicit
+content types. Resume and extraction verification compare sizes, not checksums.
+Network/server limits still apply; a speed-up is not guaranteed.
 
 ## What each stage does
 

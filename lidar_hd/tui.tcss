@@ -36,6 +36,10 @@ DataTable > .datatable--odd-row { background: #282a37; }
 #selection-count { color: $primary; margin-bottom: 1; }
 #selected-areas { height: auto; max-height: 5; margin-bottom: 1; color: #a3a7bc; }
 #clear-selection { margin-bottom: 1; height: 3; }
+#batch-options { height: auto; margin-bottom: 1; }
+#zone-name { background: $background; border: tall #55596f; }
+#zone-name:focus { border: tall $primary; }
+#output-note { height: auto; margin: 1 0; }
 #opts { height: auto; margin: 1 0; }
 Checkbox { background: transparent; border: none; padding: 0; margin-bottom: 1; }
 Checkbox:focus { background: #343747; }

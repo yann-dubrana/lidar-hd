@@ -1,6 +1,9 @@
 """Shared, independently selectable stages for the TUI and command line."""
 from __future__ import annotations
 
+import json
+import re
+import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
@@ -19,6 +22,7 @@ class Options:
     convert: bool = False
     upload: bool = False
     cleanup: bool = True
+    snowball: bool = False
 
     @property
     def stages(self) -> list[str]:
@@ -26,12 +30,68 @@ class Options:
                 if getattr(self, name)]
 
 
-def run_area(area: Area, tiles: list[tuple[int, int]], base: Path, catalog: Catalog,
+@dataclass(frozen=True)
+class NamedZone:
+    name: str
+    code: str
+    members: tuple[Area, ...]
+    level: str = "zone"
+
+    @property
+    def label(self) -> str:
+        return f"{self.name} ({len(self.members)} areas merged)"
+
+
+def zone_code(name: str) -> str:
+    """Make a portable directory/key component, never accept a path."""
+    if any(c in name for c in '/\\:'):
+        raise ValueError("Zone name must be a name, not a path.")
+    text = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
+    code = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+    if not code or len(code) > 80:
+        raise ValueError("Enter a zone name with letters or numbers (maximum 80 normalized characters).")
+    return code
+
+
+def prepare_batch(batch: list[tuple[Area, list[tuple[int, int]]]],
+                  merge_name: str | None = None) -> list[tuple[Area | NamedZone, list[tuple[int, int]]]]:
+    """Keep separate outputs by default, or union tile coverage before processing."""
+    if merge_name is None:
+        return list(batch)
+    code = zone_code(merge_name)
+    if not batch or any(not tiles for _, tiles in batch):
+        raise ValueError("Every selected area must have tiles before merging.")
+    members = tuple(sorted({(a.level, a.code): a for a, _ in batch}.values(),
+                           key=lambda a: (a.level, a.code)))
+    tiles = sorted({tile for _, coverage in batch for tile in coverage})
+    return [(NamedZone(merge_name.strip(), code, members), tiles)]
+
+
+def _bind_zone(root: Path, area: NamedZone, tiles: list[tuple[int, int]]) -> None:
+    """Refuse stale outputs when a named zone is reused for another selection."""
+    manifest = {"name": area.name, "members": [[a.level, a.code] for a in area.members],
+                "tiles": [list(tile) for tile in sorted(set(tiles))]}
+    path = root / "zone.json"
+    if path.exists():
+        if json.loads(path.read_text(encoding="utf-8")) != manifest:
+            raise ValueError("This zone name already belongs to a different selection. Choose another name.")
+        return
+    if root.exists() and any(root.iterdir()):
+        raise ValueError("This zone directory has no selection manifest. Choose another name.")
+    root.mkdir(parents=True, exist_ok=True)
+    partial = root / "zone.json.part"
+    partial.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+    partial.replace(path)
+
+
+def run_area(area: Area | NamedZone, tiles: list[tuple[int, int]], base: Path, catalog: Catalog,
              options: Options, progress: pipeline.Progress = pipeline._noop,
              should_stop: Callable[[], bool] = lambda: False,
              transfer_progress=None) -> dict[str, pipeline.StageResult]:
     """Run selected stages sequentially, reusing on-disk inputs when unchecked."""
     root = base / f"{area.level}-{area.code}"
+    if isinstance(area, NamedZone) and options.stages and not should_stop():
+        _bind_zone(root, area, tiles)
     raw, col, tiles3d = root / "raw", root / "colorized", root / "3dtiles"
     names = areas.tile_names(tiles)
     results = {}
@@ -90,8 +150,10 @@ def run_area(area: Area, tiles: list[tuple[int, int]], base: Path, catalog: Cata
                     fraction = done / total if total else 0
                     progress("upload", int((index + fraction) * 1000), len(targets) * 1000, detail)
 
-                prefix = f"{cfg.prefix}/{area.level}-{area.code}/{folder.name}"
-                item = pipeline.upload_dir(folder, prefix, cfg, upload_progress, should_stop)
+                prefix = "/".join(part for part in (cfg.prefix.strip("/"),
+                                                  f"{area.level}-{area.code}", folder.name) if part)
+                item = pipeline.upload_dir(folder, prefix, cfg, upload_progress, should_stop,
+                                           snowball=options.snowball)
                 result.ok += item.ok
                 result.skipped += item.skipped
                 result.failed.extend(item.failed)
