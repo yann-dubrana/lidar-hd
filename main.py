@@ -126,8 +126,8 @@ class LidarApp(App):
                             yield Checkbox("Export ortho PMTiles", id="do_ortho")
                             yield Checkbox("Convert to 3D Tiles", id="do_tiles")
                             yield Checkbox("Upload to MinIO", id="do_upload")
-                            yield Checkbox("Group small uploads (TAR)", id="do_snowball", disabled=True,
-                                           tooltip="MinIO Snowball extraction required. Large files and PMTiles use normal upload.")
+                            yield Checkbox("Complete tileset TAR", id="do_snowball", disabled=True,
+                                           tooltip="One streamed TAR including large tiles; extracted by MinIO. PMTiles stay separate.")
                             yield Checkbox("Clean intermediates", id="do_clean", value=True)
                         yield Static("", id="upload-note", classes="dim")
                     with Horizontal(id="actions"):
@@ -548,7 +548,7 @@ def cli(argv: list[str] | None = None) -> int:
     ap.add_argument("--no-download", action="store_true", help="reuse local inputs instead of downloading LiDAR")
     ap.add_argument("--tiles", action="store_true", help="convert to 3D Tiles")
     ap.add_argument("--upload", action="store_true", help="upload to MinIO")
-    ap.add_argument("--snowball", action="store_true", help="group small uploads into server-extracted TAR batches (MinIO only)")
+    ap.add_argument("--snowball", action="store_true", help="send the complete tileset in one server-extracted TAR, including large files (MinIO only)")
     ap.add_argument("--no-clean", action="store_true",
                     help="keep raw/ and colorized/ after a successful run")
     args = ap.parse_args(argv)

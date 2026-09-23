@@ -1,3 +1,4 @@
+import hashlib
 import io
 import tarfile
 import tempfile
@@ -37,14 +38,10 @@ class SnowballTests(unittest.TestCase):
         self.client._put_object = Mock(side_effect=self.put)
         self.client._create_multipart_upload = Mock(side_effect=AssertionError("multipart forbidden"))
         self.client.remove_object = Mock(side_effect=AssertionError("remote deletion forbidden"))
-        upload = self.client.upload_snowball_objects
-
-        def snowball(*args, **kwargs):
-            self.assertFalse(kwargs.get("compression", False))
-            self.staging.append(Path(kwargs["staging_filename"]))
-            return upload(*args, **kwargs)
-
-        self.client.upload_snowball_objects = Mock(side_effect=snowball)
+        self.client.upload_snowball_objects = Mock(side_effect=AssertionError("buffered upload forbidden"))
+        self.client._region_map["bucket"] = "us-east-1"
+        self.client._http = Mock()
+        self.client._http.urlopen = Mock(side_effect=self.stream_put)
         constructor = patch("minio.Minio", return_value=self.client)
         constructor.start()
         self.addCleanup(constructor.stop)
@@ -55,21 +52,33 @@ class SnowballTests(unittest.TestCase):
         return SimpleNamespace(size=self.remote[key])
 
     def put(self, bucket, key, data, headers):
-        if key.startswith("snowball."):
-            self.assertEqual(headers["X-Amz-Meta-Snowball-Auto-Extract"], "true")
-            self.assertTrue(self.staging[-1].is_file())
-            self.assertLessEqual(len(data), pipeline._SNOWBALL_MAX_BYTES)
-            with tarfile.open(fileobj=io.BytesIO(data), mode="r:") as archive:
-                objects = {m.name: archive.extractfile(m).read() for m in archive.getmembers()}
-            self.assertLessEqual(len(objects), pipeline._SNOWBALL_MAX_FILES)
-            self.archives.append(objects)
-            if self.extract:
-                self.remote.update({name: len(content) for name, content in objects.items()})
-        else:
-            self.normal.append((key, headers["Content-Type"]))
-            self.remote[key] = len(data)
+        self.normal.append((key, headers["Content-Type"]))
+        self.remote[key] = len(data)
         self.after_put()
         return Mock()
+
+    def stream_put(self, method, url, *, body, headers, **kwargs):
+        self.assertEqual(method, "PUT")
+        self.assertIn("/bucket/snowball.", url)
+        self.assertEqual(headers["X-Amz-Meta-Snowball-Auto-Extract"], "true")
+        self.assertIn("x-amz-meta-snowball-auto-extract", headers["Authorization"])
+        self.assertEqual(kwargs, dict(preload_content=False, retries=False, redirect=False))
+        self.staging.append(Path(body.stream.name))
+        self.assertTrue(self.staging[-1].is_file())
+        chunks = []
+        while data := body.read(64 * 1024):
+            chunks.append(data)
+        data = b"".join(chunks)
+        self.assertEqual(len(data), int(headers["Content-Length"]))
+        self.assertEqual(hashlib.sha256(data).hexdigest(), headers["x-amz-content-sha256"])
+        with tarfile.open(fileobj=io.BytesIO(data), mode="r:") as archive:
+            self.assertTrue(all(member.isfile() for member in archive.getmembers()))
+            objects = {m.name: archive.extractfile(m).read() for m in archive.getmembers()}
+        self.archives.append(objects)
+        if self.extract:
+            self.remote.update({name: len(content) for name, content in objects.items()})
+        self.after_put()
+        return Mock(status=200)
 
     def file(self, name, data=b"abc"):
         path = self.root / name
@@ -109,8 +118,8 @@ class SnowballTests(unittest.TestCase):
             self.file(name)
         self.remote.update({"same.pnts": 3, "changed.pnts": 1})
         result = self.run_upload("", snowball=True)
-        self.assertEqual((result.ok, result.skipped, result.bytes_moved), (2, 1, 6))
-        self.assertEqual(self.archives, [{"changed.pnts": b"abc", "new.pnts": b"abc"}])
+        self.assertEqual((result.ok, result.skipped, result.bytes_moved), (3, 0, 9))
+        self.assertEqual(self.archives, [{"same.pnts": b"abc", "changed.pnts": b"abc", "new.pnts": b"abc"}])
 
     def test_missing_extraction_is_explicit_failure_without_fallback(self):
         self.file("a.pnts")
@@ -134,44 +143,39 @@ class SnowballTests(unittest.TestCase):
     def test_upload_error_cleans_archive_and_stops_next_batch(self):
         for i in range(3):
             self.file(f"{i}.pnts")
-        self.client._put_object.side_effect = RuntimeError("Snowball unsupported")
-        with patch.object(pipeline, "_SNOWBALL_MAX_FILES", 1):
-            result = self.run_upload(snowball=True)
-        self.assertEqual((result.ok, len(result.failed)), (0, 1))
-        self.assertEqual(self.client.upload_snowball_objects.call_count, 1)
+        def fail(*args, **kwargs):
+            self.staging.append(Path(kwargs["body"].stream.name))
+            raise RuntimeError("Snowball unsupported")
+        self.client._http.urlopen.side_effect = fail
+        result = self.run_upload(snowball=True)
+        self.assertEqual((result.ok, len(result.failed)), (0, 3))
+        self.assertEqual(self.client._http.urlopen.call_count, 1)
         self.assertFalse(self.normal)
         self.assertTrue(all(not path.exists() for path in self.staging))
 
     def test_batches_bound_tar_bytes_including_headers_and_file_count(self):
         for i in range(5):
             self.file(f"{'é' * 80}/{i}.pnts", b"x" * 4096)
-        with patch.object(pipeline, "_SNOWBALL_MAX_BYTES", 10240), \
-                patch.object(pipeline, "_SNOWBALL_MAX_FILES", 2):
-            result = self.run_upload(snowball=True)
+        result = self.run_upload(snowball=True)
         self.assertEqual(result.ok, 5)
-        self.assertEqual(len(self.archives), 5)
-        self.archives.clear()
-        self.remote.clear()
-        with patch.object(pipeline, "_SNOWBALL_MAX_FILES", 2):
-            result = self.run_upload(snowball=True)
-        self.assertEqual(result.ok, 5)
-        self.assertEqual(sorted(map(len, self.archives)), [1, 2, 2])
+        self.assertEqual(len(self.archives), 1)
+        self.assertEqual(len(self.archives[0]), 5)
 
     def test_large_objects_and_pmtiles_use_normal_upload(self):
         self.file("small.pnts")
         self.file("large.pnts", b"x" * 11)
         self.file("ortho.PMTILES")
-        with patch.object(pipeline, "_SNOWBALL_LARGE_FILE", 10):
-            result = self.run_upload(snowball=True)
+        result = self.run_upload(snowball=True)
         self.assertEqual((result.ok, result.bytes_moved), (3, 17))
-        self.assertEqual(self.archives, [{"area/small.pnts": b"abc"}])
-        self.assertCountEqual([name for name, _ in self.normal], ["area/large.pnts", "area/ortho.PMTILES"])
+        self.assertEqual(self.archives, [{"area/small.pnts": b"abc", "area/large.pnts": b"x" * 11}])
+        self.assertEqual([name for name, _ in self.normal], ["area/ortho.PMTILES"])
 
     def test_single_put_above_sdk_multipart_threshold(self):
         self.file("points.pnts", b"x" * (6 * 1024 * 1024))
         result = self.run_upload(snowball=True)
         self.assertEqual(result.ok, 1)
-        self.client._put_object.assert_called_once()
+        self.client._http.urlopen.assert_called_once()
+        self.client._put_object.assert_not_called()
         self.client._create_multipart_upload.assert_not_called()
 
     def test_cancellation_before_upload_and_between_batches(self):
@@ -182,12 +186,12 @@ class SnowballTests(unittest.TestCase):
         self.assertEqual(result.ok, 0)
         self.client.stat_object.assert_not_called()
         self.client.upload_snowball_objects.assert_not_called()
+        self.client._http.urlopen.assert_not_called()
         self.stop = False
         self.after_put = lambda: setattr(self, "stop", True)
-        with patch.object(pipeline, "_SNOWBALL_MAX_FILES", 1):
-            result = self.run_upload(snowball=True)
-        self.assertEqual((result.ok, result.failed), (1, []))
-        self.assertEqual(self.client.upload_snowball_objects.call_count, 1)
+        result = self.run_upload(snowball=True)
+        self.assertEqual((result.ok, result.failed), (0, []))
+        self.assertEqual(self.client._http.urlopen.call_count, 1)
 
     def test_empty_and_all_present_do_not_upload_tar(self):
         result = self.run_upload(snowball=True)
@@ -197,6 +201,7 @@ class SnowballTests(unittest.TestCase):
         result = self.run_upload(snowball=True)
         self.assertEqual((result.ok, result.skipped), (0, 1))
         self.client.upload_snowball_objects.assert_not_called()
+        self.client._http.urlopen.assert_not_called()
 
     def test_cancellation_discards_pending_batch(self):
         self.file("a.pnts")
@@ -211,15 +216,15 @@ class SnowballTests(unittest.TestCase):
         result = self.run_upload(snowball=True)
         self.assertEqual((result.ok, result.failed, result.bytes_moved), (0, [], 0))
         self.client.upload_snowball_objects.assert_not_called()
+        self.client._http.urlopen.assert_not_called()
 
     def test_failed_extraction_stops_before_later_batches(self):
         for i in range(3):
             self.file(f"{i}.pnts")
         self.extract = False
-        with patch.object(pipeline, "_SNOWBALL_MAX_FILES", 1):
-            result = self.run_upload(snowball=True)
-        self.assertEqual((result.ok, result.bytes_moved, len(result.failed)), (0, 0, 1))
-        self.assertEqual(self.client.upload_snowball_objects.call_count, 1)
+        result = self.run_upload(snowball=True)
+        self.assertEqual((result.ok, result.bytes_moved, len(result.failed)), (0, 0, 3))
+        self.assertEqual(self.client._http.urlopen.call_count, 1)
         self.assertFalse(self.normal)
 
     def test_growing_source_fails_before_put_and_cleans_staging(self):
@@ -233,8 +238,8 @@ class SnowballTests(unittest.TestCase):
         result = self.run_upload(snowball=True)
         self.assertEqual((result.ok, result.bytes_moved, result.failed), (0, 0, ["area/a.pnts"]))
         self.client._put_object.assert_not_called()
-        self.assertTrue(self.staging)
-        self.assertTrue(all(not path.parent.exists() for path in self.staging))
+        self.client._http.urlopen.assert_not_called()
+        self.assertEqual(list(self.root.iterdir()), [path])
 
 
 if __name__ == "__main__":

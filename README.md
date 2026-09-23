@@ -224,9 +224,9 @@ Names, SIREN codes and contours come from the public
 [API Découpage administratif](https://geo.api.gouv.fr/decoupage-administratif/epcis).
 Contours are reprojected from WGS84 to Lambert-93 before finding LiDAR tiles.
 
-## Optional MinIO TAR batches
+## Optional complete-tileset MinIO TAR
 
-Enable **Upload to MinIO** and **Group small uploads (TAR)**, or use
+Enable **Upload to MinIO** and **Complete tileset TAR**, or use
 `--upload --snowball`. Normal per-file uploads remain the default.
 This uses MinIO's Snowball server-side extraction protocol, **not a ZIP stored
 as an ordinary object**. Archive members carry the full destination keys so
@@ -238,14 +238,29 @@ Use a MinIO server that supports Snowball extraction; a generic S3-compatible
 endpoint need not support it. Extraction is checked before reporting success.
 If it fails or is unsupported, the run reports errors and keeps local inputs;
 it does not silently switch upload modes or delete remote objects.
-Large files and PMTiles keep the normal upload path. Grouping targets the many
-small 3D Tiles files, not compression of already-compressed imagery. Temporary
-disk space is required for each TAR batch (at most 128 MiB or 256 files); the
-Python SDK also buffers the single PUT in memory. Files of 16 MiB or more and
-PMTiles are uploaded individually. Per-file MIME metadata is not carried by
-Snowball; use normal uploads if your serving setup requires those explicit
-content types. Resume and extraction verification compare sizes, not checksums.
-Network/server limits still apply; a speed-up is not guaranteed.
+The **entire tileset**, including large tiles and every subdirectory's files,
+is sent in **one uncompressed TAR per output directory**, without the old
+16 MiB cutoff or 128 MiB / 256-file batches. PMTiles remain separate normal
+uploads, so the basemap can still be read using HTTP Range requests.
+The TAR is staged on disk (allow space for a full additional copy) and streamed
+in a single signed PUT with bounded memory, not multipart: MinIO extraction
+does not work with multipart uploads. The SDK's 5 GiB part limit is bypassed;
+actual MinIO server and reverse-proxy body-size/time limits still apply.
+The activity log reports TAR preparation and bytes sent. Cancelling can leave
+partially extracted remote objects; local inputs are retained. The temporary
+local TAR is removed after success, failure or cancellation.
+
+If every destination file already has the expected size, no TAR is sent.
+Otherwise the **whole tileset is resent**, including existing files, to keep
+one complete archive. Extraction is verified by file size, not checksum.
+Per-file MIME metadata is not carried by Snowball; use normal uploads if your
+serving setup requires explicit content types. A speed-up is not guaranteed.
+
+After successful conversion, and before uploading an existing complete tileset,
+empty subdirectories under `points/` are removed locally. Files (including
+zero-byte files), non-empty directories, links and junctions are preserved;
+no remote objects are deleted. TAR archives contain files only, not empty
+directory entries, so tile URLs and the tileset tree remain unchanged.
 
 ## What each stage does
 
