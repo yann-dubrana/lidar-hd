@@ -42,8 +42,9 @@ class PackagingTests(unittest.TestCase):
                 patch("lidar_hd.pipeline.subprocess.run", return_value=Mock(returncode=0)) as run:
             result = pipeline.convert_3dtiles([Path("input.laz")], self.root / "output", jobs=1)
         external.assert_not_called()
-        self.assertEqual(run.call_args.args[0][:3],
-                         ["portable-lidar.exe", "--internal-py3dtiles", "convert"])
+        self.assertEqual(run.call_args.args[0][:2],
+                         ["portable-lidar.exe", "--internal-py3dtiles"])
+        self.assertEqual(Path(run.call_args.args[0][2]).name, "arguments.json")
         self.assertEqual(result.ok, 1)
 
     def test_source_conversion_keeps_existing_entry_point(self):
@@ -51,7 +52,9 @@ class PackagingTests(unittest.TestCase):
                 patch("lidar_hd.pipeline.py3dtiles_exe", return_value=Path("py3dtiles.exe")), \
                 patch("lidar_hd.pipeline.subprocess.run", return_value=Mock(returncode=0)) as run:
             pipeline.convert_3dtiles([Path("input.laz")], self.root / "output")
-        self.assertEqual(run.call_args.args[0][:2], ["py3dtiles.exe", "convert"])
+        self.assertEqual(run.call_args.args[0][:3],
+                         [sys.executable, "-m", "lidar_hd.conversion"])
+        self.assertEqual(Path(run.call_args.args[0][3]).name, "arguments.json")
 
 
 if __name__ == "__main__":

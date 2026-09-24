@@ -1,5 +1,13 @@
 # lidarhd
 
+> **Disclaimer — vibe-coded, experimental, not production-ready.**
+> This project was built with extensive AI assistance ("vibe coding"). Expect
+> bugs, incomplete validation and performance issues; passing tests do not
+> guarantee correctness, security or reliability on real datasets and servers.
+> Use at your own risk: keep backups, test on small areas and a separate bucket,
+> and verify outputs before relying on them. Leave cleanup disabled while
+> experimenting, as it can delete local intermediate files.
+
 Download IGN LiDAR HD for French communes, intercommunalities (EPCI), departments or regions; optionally
 drape orthophoto colour, export a 20 cm raster basemap, convert to 3D Tiles,
 and mirror to MinIO.

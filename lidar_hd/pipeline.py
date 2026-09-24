@@ -5,6 +5,7 @@ interrupted job continues where it stopped rather than starting over.
 """
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import subprocess
@@ -280,19 +281,28 @@ def convert_3dtiles(inputs: Iterable[Path], out_dir: Path,
     if out_dir.exists():
         shutil.rmtree(out_dir)
 
-    cmd = ([sys.executable, "--internal-py3dtiles"] if getattr(sys, "frozen", False)
-           else [str(py3dtiles_exe())])
-    cmd += ["convert", *[str(p) for p in inputs],
-           "--out", str(out_dir),
-           "--srs_in", str(LAMBERT93), "--srs_out", str(ECEF)]
+    arguments = ["convert", *[str(p.resolve()) for p in inputs],
+                 "--out", str(out_dir.resolve()),
+                 "--srs_in", str(LAMBERT93), "--srs_out", str(ECEF)]
     if keep_classification:
         # Lands in the .pnts batch table, which the viewer decodes.
-        cmd += ["--extra-fields", "classification"]
+        arguments += ["--extra-fields", "classification"]
     if jobs:
-        cmd += ["--jobs", str(jobs)]
+        arguments += ["--jobs", str(jobs)]
 
     progress("convert", 0, 1, f"{len(inputs)} tiles -> {out_dir.name}")
-    proc = subprocess.run(cmd, capture_output=True, text=True)
+    out_dir.parent.mkdir(parents=True, exist_ok=True)
+    # Keep the OS command short even for thousands of inputs. Close the manifest
+    # before launching so the worker can open it on Windows.
+    with tempfile.TemporaryDirectory(prefix=".conversion-", dir=out_dir.resolve().parent) as directory:
+        manifest = Path(directory) / "arguments.json"
+        manifest.write_text(json.dumps(arguments, ensure_ascii=False), encoding="utf-8")
+        frozen = getattr(sys, "frozen", False)
+        cmd = ([sys.executable, "--internal-py3dtiles"] if frozen
+               else [sys.executable, "-m", "lidar_hd.conversion"])
+        cmd.append(str(manifest))
+        proc = subprocess.run(cmd, capture_output=True, text=True,
+                              cwd=None if frozen else Path(__file__).resolve().parent.parent)
     if proc.returncode != 0:
         res.failed.append(proc.stderr.strip().splitlines()[-1] if proc.stderr else "py3dtiles failed")
     else:
