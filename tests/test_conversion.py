@@ -31,7 +31,7 @@ class ConversionTests(unittest.TestCase):
                     args = json.loads(manifest.read_text(encoding="utf-8"))
                     self.assertEqual(args, ["convert", *map(str, inputs),
                                            "--out", str(self.root / "output"),
-                                           "--srs_in", "2154", "--srs_out", "4978",
+                                           "--srs_in", "5698", "--force-srs-in", "--srs_out", "4978",
                                            "--extra-fields", "classification", "--jobs", "2"])
                     return Mock(returncode=0)
 
@@ -84,6 +84,16 @@ class ConversionTests(unittest.TestCase):
                            run_name="__main__")
         self.assertEqual(received, [args])
 
+    def test_worker_refuses_to_convert_without_the_geoid(self):
+        from lidar_hd import conversion
+
+        manifest = self.root / "inputs.json"
+        manifest.write_text(json.dumps(["convert", "a.laz", "--srs_in", "5698"]), encoding="utf-8")
+        flat = Mock(transform=Mock(return_value=(3.0, 46.5, 0.0)))
+        with patch("pyproj.Transformer.from_crs", return_value=flat),                 patch.dict("os.environ"),                 patch("py3dtiles.command_line.main") as main,                 self.assertRaisesRegex(RuntimeError, "geoid"):
+            conversion.run_manifest(str(manifest))
+        main.assert_not_called()
+
     def test_real_worker_converts_multiple_inputs_to_one_tileset(self):
         import laspy
         import numpy as np
@@ -107,7 +117,14 @@ class ConversionTests(unittest.TestCase):
         self.assertFalse(result.failed, result.failed)
         self.assertEqual(result.ok, 2)
         self.assertEqual(len(list(output.rglob("tileset.json"))), 1)
-        self.assertTrue(json.loads((output / "tileset.json").read_text())["root"]["boundingVolume"])
+        root = json.loads((output / "tileset.json").read_text())["root"]
+        self.assertTrue(root["boundingVolume"])
+        # NGF-IGN69 altitude 50 m is about 96 m above the ellipsoid here: the
+        # workers found the geoid grid, not just this process.
+        from pyproj import Transformer
+        centre = np.array(root["boundingVolume"]["box"][:3]) + root.get("transform", [0] * 16)[12:15]
+        height = Transformer.from_crs(4978, 4979, always_xy=True).transform(*centre)[2]
+        self.assertTrue(90 < height < 100, height)
         self.assertTrue(list(output.rglob("*.pnts")))
         self.assertTrue(all(source.is_file() for source in inputs))
         self.assertFalse(list(output.parent.glob(".conversion-*")))

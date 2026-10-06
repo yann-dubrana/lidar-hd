@@ -21,7 +21,7 @@ from typing import Callable, Iterable
 
 from .catalog import Catalog
 from .config import (CLASS_COLOR_OTHER, CLASS_COLORS, COLOR_VERSION, COLORIZE_GROWTH,
-                     DOWNLOAD_WORKERS, ECEF, GROUND_CELL_M, LAMBERT93, MEAN_TILE_BYTES,
+                     DOWNLOAD_WORKERS, ECEF, GROUND_CELL_M, LAMBERT93, LAMBERT93_IGN69, MEAN_TILE_BYTES,
                      OCCLUSION_CELL_M, OCCLUSION_DZ_M, TILES3D_GROWTH)
 from .http import HttpError, download
 
@@ -223,6 +223,42 @@ def _cell_extremes(cell, value, ufunc):
     return cells[starts], ufunc.reduceat(value[order], starts)
 
 
+def _ground_grid(cell, shape, z):
+    """Lowest `z` per cell as a dense grid, empty cells filled from their neighbours."""
+    import numpy as np
+    from rasterio.fill import fillnodata
+
+    lows_at, lows = _cell_extremes(cell, z, np.minimum)
+    grid = np.zeros(shape, dtype=np.float32)
+    known = np.zeros(shape, dtype=bool)
+    grid.flat[lows_at], known.flat[lows_at] = lows, True
+    return fillnodata(grid, mask=known, max_search_distance=max(shape))
+
+
+def _conversion_inputs(inputs: list[Path]) -> bool:
+    """True when every input carries `height`; refuses one not declared in Lambert-93.
+
+    The conversion forces Lambert-93 + NGF-IGN69 on every input, so a file
+    declaring anything else would be placed wrongly without a word.
+    """
+    import laspy
+
+    heights = True
+    for path in inputs:
+        try:
+            with laspy.open(str(path)) as reader:
+                header = reader.header
+                heights &= "height" in header.point_format.dimension_names
+                crs = header.parse_crs()
+        except Exception:                     # noqa: BLE001 - unreadable: py3dtiles reports it
+            heights = False
+            continue
+        codes = {c.to_epsg() for c in (crs, *crs.sub_crs_list)} - {None} if crs is not None else set()
+        if codes and not codes & {LAMBERT93, LAMBERT93_IGN69}:
+            raise ValueError(f"{path.name} is declared in {crs.name}, not Lambert-93")
+    return heights
+
+
 def colorize_tile(src: Path, dst: Path, *, ortho_cache: Path) -> int:
     """Drape IGN BD ORTHO onto one tile, rewriting format 6 -> 7.
 
@@ -288,14 +324,8 @@ def colorize_tile(src: Path, dst: Path, *, ortho_cache: Path) -> int:
     height = np.zeros(len(z), dtype=np.uint16)
     ground = cls == 2
     if ground.any():
-        from rasterio.fill import fillnodata
-
         cell, shape = cells(GROUND_CELL_M)
-        lows_at, lows = _cell_extremes(cell[ground], z[ground], np.minimum)
-        grid = np.zeros(shape, dtype=np.float32)
-        known = np.zeros(shape, dtype=bool)
-        grid.flat[lows_at], known.flat[lows_at] = lows, True
-        grid = fillnodata(grid, mask=known, max_search_distance=max(shape))
+        grid = _ground_grid(cell[ground], shape, z[ground])
         height = np.clip((z - grid.flat[cell]) * 100, 0, 65535).astype(np.uint16)
 
     hdr = laspy.LasHeader(version="1.4", point_format=7)
@@ -374,11 +404,13 @@ def convert_3dtiles(inputs: Iterable[Path], out_dir: Path,
 
     arguments = ["convert", *[str(p.resolve()) for p in inputs],
                  "--out", str(out_dir.resolve()),
-                 "--srs_in", str(LAMBERT93), "--srs_out", str(ECEF),
+                 # Forced: tiles declare plain Lambert-93, which has no altitude
+                 # datum, and py3dtiles accepts one input CRS for all files.
+                 "--srs_in", str(LAMBERT93_IGN69), "--force-srs-in", "--srs_out", str(ECEF),
                  # Lands in the .pnts batch table, which the viewer decodes.
                  "--extra-fields", "classification"]
     # Only when every input has it: py3dtiles would give the others height 0.
-    if all(_coloured(p) for p in inputs):
+    if _conversion_inputs(inputs):
         arguments += ["--extra-fields", "height"]
     if jobs:
         arguments += ["--jobs", str(jobs)]

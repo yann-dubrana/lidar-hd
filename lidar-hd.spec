@@ -4,6 +4,7 @@ from PyInstaller.utils.hooks import collect_all, copy_metadata
 
 root = Path(SPECPATH)
 datas = [(str(root / "lidar_hd" / "tui.tcss"), "lidar_hd"),
+         (str(root / "lidar_hd" / "proj" / "fr_ign_RAF20.tif"), "lidar_hd/proj"),
          (str(root / "README.md"), "."),
          (str(root / ".env.example"), ".")]
 binaries = []

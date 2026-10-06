@@ -37,6 +37,12 @@ ORTHO_LAYER = "HR.ORTHOIMAGERY.ORTHOPHOTOS"
 USER_AGENT = "Mozilla/5.0"          # data.geopf.fr rejects requests without one
 LAMBERT93 = 2154
 ECEF = 4978                         # what 3D Tiles viewers expect
+# LiDAR HD altitudes are NGF-IGN69, not ellipsoidal heights: converting from
+# plain Lambert-93 would leave the whole tileset about 45 m too low.
+LAMBERT93_IGN69 = 5698
+# IGN's RAF20 geoid (Open Licence 2.0), shipped because PROJ does not: without
+# the grid it applies no vertical shift at all, and says so only in a warning.
+GEOID_DIR = Path(__file__).resolve().parent / "proj"
 
 # Catalogue/WFS/WMS loops stay sequential. Tile downloads run in parallel:
 # against data.geopf.fr, 8 connections ran without errors and 16 added HTTP 429
@@ -84,6 +90,14 @@ CLASS_COLORS = {
     5: (35, 105, 45), 6: (196, 186, 170), 9: (70, 130, 180), 17: (176, 160, 112),
 }
 CLASS_COLOR_OTHER = (130, 136, 144)
+
+# --- enriched file tuning ----------------------------------------------------
+
+# A LiDAR HD point sharing a cube of this size with the user's file is dropped.
+# Also the cell used to compare the file's altitude with LiDAR HD.
+SITE_VOXEL_M = 1.0
+# Median altitude difference with LiDAR HD below which the file is left alone.
+Z_TOLERANCE_M = 0.3
 
 
 @dataclass(frozen=True)

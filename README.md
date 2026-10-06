@@ -216,14 +216,51 @@ optional EPSG); a path there replaces the area selection. On the command line:
     python main.py --file site.las --buffer 200 --color   # file + 200 m of LiDAR HD
     python main.py --file indoor.las                      # file alone (interior scan)
     python main.py --file site.las --buffer 200 --srs 3945
+    python main.py --file site.las --buffer 200 --z-align # shift the file onto LiDAR HD
 
 The file is reprojected to Lambert-93 and LiDAR HD tiles are cropped to the
 perimeter, then both go through one conversion into `site-<name>/3dtiles/`.
 The CRS is read from the file, else guessed from the coordinates (Lambert-93 or
 Lambert CC42–CC50); the detected centre is shown so you can check it. Files
-without RGB are shaded by intensity. Heights are not converted: the file is
-assumed to share LiDAR HD's IGN69 altitudes. LiDAR HD points under the file's
-footprint are kept, so the two clouds overlap there.
+without RGB are shaded by intensity.
+
+With a perimeter, the file's altitudes are compared with the LiDAR HD under it
+before anything is written, and the result is shown: the median difference,
+its spread and the number of 1 m cells compared. Ground is compared with
+ground when the file has classified ground (class 2), otherwise the lowest
+return of each cell on both sides.
+
+- Within 0.3 m: the file is used as it is.
+- Equal to the local geoid height (about 45 m, within 1 m): the file is in
+  ellipsoidal heights and is lowered by the geoid automatically.
+- Any other ground offset stops the run and reports the figure. Correct the
+  file, or pass `--z-align` (**Align altitude on LiDAR HD** in the TUI) to
+  shift it by the measured difference.
+- A file with no classified ground (a roof, a canopy) cannot be verified this
+  way: the difference is reported and the file is left as it is.
+
+Without a perimeter there is no LiDAR HD to compare with, and the file's
+altitudes are taken as NGF-IGN69.
+
+What the file declares is used first. A 3D CRS means ellipsoidal heights, which
+are lowered by the geoid in every mode. A compound CRS naming another altitude
+datum is refused rather than passed through unchanged; `--srs` overrides the
+declaration.
+
+LiDAR HD points that share a 1 m cube with the file are dropped, so the file
+replaces LiDAR HD where it has points and only there: an interior scan keeps
+the LiDAR HD roof above it. `--keep-overlap` (**Keep duplicated LiDAR HD**)
+keeps both. Survey noise (class 65) is dropped from the cropped tiles. When the
+tiles are colourised, the file also gets the `height` above LiDAR HD's ground
+that the viewer's height mode reads.
+
+## Altitudes in the tileset
+
+LiDAR HD altitudes are NGF-IGN69, measured from the geoid; 3D Tiles positions
+are measured from the ellipsoid, about 45 m lower in mainland France. The
+conversion applies IGN's RAF20 geoid grid, shipped in `lidar_hd/proj/`
+(© IGN, Open Licence 2.0), and refuses to run if PROJ cannot see it. Tilesets
+converted before this change sit about 45 m too low: convert them again.
 
 ## Separate outputs or a named merged zone
 

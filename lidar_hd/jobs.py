@@ -24,6 +24,8 @@ class Options:
     upload: bool = False
     cleanup: bool = True
     snowball: bool = False
+    z_align: bool = False            # enriched file: shift it onto LiDAR HD's altitude
+    keep_overlap: bool = False       # enriched file: keep the LiDAR HD points it duplicates
 
     @property
     def stages(self) -> list[str]:
@@ -161,12 +163,20 @@ def run_area(area: Area | NamedZone | Site, tiles: list[tuple[int, int]], base: 
         elif stage == "convert":
             inputs = sorted(source.glob("*.laz"))
             if enriched:
+                check = ground = None
+                if inputs:
+                    progress(stage, 0, 1, f"Comparing {enriched.source.name} with LiDAR HD altitudes")
+                    check, ground = site.survey(enriched.source, enriched.epsg, inputs, enriched.bbox)
+                shift, verdict = site.z_shift(check, enriched.bbox, options.z_align)
+                progress(stage, 0, 1, verdict)
+                progress(stage, 0, 1, f"Reprojecting {enriched.source.name}")
+                prepared = site.prepare(enriched.source, root / "enriched" / f"{enriched.code}.las",
+                                        enriched.epsg, enriched.bbox, shift=shift, ground=ground)
                 if enriched.clip:
                     progress(stage, 0, 1, f"Cropping {len(inputs)} tiles to the perimeter")
-                    inputs = site.clip_tiles(inputs, root / "clipped", enriched.clip)
-                progress(stage, 0, 1, f"Reprojecting {enriched.source.name}")
-                inputs.append(site.prepare(enriched.source, root / "enriched" / f"{enriched.code}.las",
-                                           enriched.epsg, enriched.bbox))
+                    inputs = site.clip_tiles(inputs, root / "clipped", enriched.clip,
+                                             None if options.keep_overlap else site.occupied(prepared))
+                inputs.append(prepared)
             if not inputs:
                 raise ValueError("Convert needs raw or colourised LiDAR files. Enable Download first.")
             result = pipeline.convert_3dtiles(inputs, tiles3d, progress=progress)

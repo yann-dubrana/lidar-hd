@@ -111,6 +111,10 @@ class LidarApp(App):
                                         tooltip="Only when the file declares no CRS and detection is wrong.")
                         yield Static("Paste a path to convert your own point cloud, alone or set into LiDAR HD.",
                                      id="site-note", classes="dim", markup=False)
+                        yield Checkbox("Align altitude on LiDAR HD", id="z-align",
+                                       tooltip="Shift the file by its measured altitude difference with LiDAR HD.")
+                        yield Checkbox("Keep duplicated LiDAR HD", id="keep-overlap",
+                                       tooltip="Keep the LiDAR HD points that share a 1 m cube with the file.")
                 with Vertical(id="details", classes="pane"):
                     with VerticalScroll(id="details-scroll"):
                         yield Static("0 areas selected", id="selection-count")
@@ -264,7 +268,9 @@ class LidarApp(App):
                                for stage, suffix in (("download", "download"), ("colorize", "color"),
                                                      ("ortho", "ortho"), ("convert", "tiles"),
                                                      ("upload", "upload"), ("cleanup", "clean"),
-                                                     ("snowball", "snowball"))})
+                                                     ("snowball", "snowball"))},
+                            z_align=self.query_one("#z-align", Checkbox).value,
+                            keep_overlap=self.query_one("#keep-overlap", Checkbox).value)
 
     @on(RadioSet.Changed, "#level")
     def change_level(self) -> None:
@@ -594,6 +600,10 @@ def cli(argv: list[str] | None = None) -> int:
     ap.add_argument("--buffer", type=float,
                     help="with --file: metres of LiDAR HD around the file (omit for the file alone)")
     ap.add_argument("--srs", type=int, help="with --file: EPSG code when the file declares none")
+    ap.add_argument("--z-align", action="store_true",
+                    help="with --file: shift the file by its measured altitude difference with LiDAR HD")
+    ap.add_argument("--keep-overlap", action="store_true",
+                    help="with --file: keep the LiDAR HD points that share a 1 m cube with the file")
     ap.add_argument("--estimate-only", action="store_true",
                     help="print the estimate and exit")
     ap.add_argument("--color", action="store_true", help="colourise after download")
@@ -622,7 +632,8 @@ def cli(argv: list[str] | None = None) -> int:
     catalog = Catalog.load(data_root() / "catalog.json")
     options = jobs.Options(download=not args.no_download, colorize=args.color,
                            ortho=args.ortho, convert=args.tiles or bool(args.file), upload=args.upload,
-                           cleanup=not args.no_clean, snowball=args.snowball)
+                           cleanup=not args.no_clean, snowball=args.snowball,
+                           z_align=args.z_align, keep_overlap=args.keep_overlap)
 
     def progress(stage: str, done: int, total: int, detail: str) -> None:
         print(f"[{stage} {done}/{total}] {detail}", flush=True)

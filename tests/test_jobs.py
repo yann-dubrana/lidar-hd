@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from lidar_hd import jobs, pipeline
+from lidar_hd import jobs, pipeline, site
 from lidar_hd.areas import Area
 from lidar_hd.config import MinioConfig
 
@@ -57,7 +57,7 @@ class JobTests(unittest.TestCase):
         self.assertEqual(upload.call_args.args[1], "lidar-hd/commune-12345/ortho")
         self.assertEqual(result["upload"].ok, 2)
 
-    @patch("lidar_hd.site.prepare", side_effect=lambda source, dst, epsg, bbox: dst)
+    @patch("lidar_hd.site.prepare", side_effect=lambda source, dst, epsg, bbox, **kw: dst)
     @patch("lidar_hd.pipeline.convert_3dtiles", return_value=pipeline.StageResult(ok=1))
     def test_enriched_file_alone_always_converts(self, convert, prepare):
         source = self.base / "in" / "Scan.las"
@@ -74,6 +74,33 @@ class JobTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Rename"):
             jobs.run_area(jobs.Site("Scan", "scan", other, 3945, (0, 0, 1, 1), (0, 0)), [], self.base,
                           self.catalog, jobs.Options(cleanup=False))
+
+    @patch("lidar_hd.pipeline.convert_3dtiles", return_value=pipeline.StageResult(ok=1))
+    @patch("lidar_hd.site.clip_tiles", return_value=[])
+    @patch("lidar_hd.site.occupied", return_value="voxels")
+    @patch("lidar_hd.site.prepare", side_effect=lambda source, dst, epsg, bbox, **kw: dst)
+    @patch("lidar_hd.site.survey", return_value=(site.ZCheck(3.0, 0.1, 400, True), "ground"))
+    def test_enriched_file_is_checked_before_it_replaces_lidar_points(self, survey, prepare, occupied,
+                                                                      clip, convert):
+        source = self.base / "in" / "Scan.las"
+        source.parent.mkdir()
+        source.write_bytes(b"las")
+        tile = self.base / "site-scan" / "raw" / "LHD.copc.laz"
+        tile.parent.mkdir(parents=True)
+        tile.touch()
+        found = jobs.Site("Scan", "scan", source, 2154, (0, 0, 1, 1), (0, 0), clip=(-5, -5, 6, 6))
+
+        with self.assertRaisesRegex(ValueError, "z-align"):
+            jobs.run_area(found, [], self.base, self.catalog, self.options())
+        prepare.assert_not_called()
+
+        jobs.run_area(found, [], self.base, self.catalog, self.options(z_align=True))
+        self.assertEqual(prepare.call_args.kwargs, {"shift": -3.0, "ground": "ground"})
+        self.assertEqual(clip.call_args.args[3], "voxels")
+        self.assertEqual(convert.call_args.args[0], [self.base / "site-scan" / "enriched" / "scan.las"])
+
+        jobs.run_area(found, [], self.base, self.catalog, self.options(z_align=True, keep_overlap=True))
+        self.assertIsNone(clip.call_args.args[3])
 
     @patch("lidar_hd.pipeline.download_tiles", return_value=pipeline.StageResult(ok=1))
     def test_download_passes_transfer_callback(self, download):

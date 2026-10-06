@@ -33,13 +33,15 @@ def run() -> None:
     from PIL import Image
     from pmtiles.reader import MemorySource, Reader
     from pyproj import Transformer
-    from . import ortho, pipeline
+    from . import ortho, pipeline, site
     from .config import application_root
 
     assert ssl.create_default_context().cert_store_stats()["x509_ca"] > 0
     Minio("localhost:9000", access_key="self-test", secret_key="self-test")
     lon, lat = Transformer.from_crs(2154, 4326, always_xy=True).transform(420500, 6439500)
     assert -2 < lon < 0 and 44 < lat < 46
+    # The geoid grid is data, not code: nothing imports it into the bundle.
+    assert 40 < site.undulation(420500, 6439500) < 60
 
     with tempfile.TemporaryDirectory(prefix="self-test-", dir=application_root()) as directory:
         root = Path(directory)
@@ -62,6 +64,10 @@ def run() -> None:
             raise RuntimeError(f"Bundled conversion failed: {result.failed}")
         tileset = json.loads((root / "3dtiles" / "tileset.json").read_text())
         assert tileset["root"]["boundingVolume"]
+        # The workers found the geoid grid too: altitude 50 m is about 96 m up.
+        centre = np.array(tileset["root"]["boundingVolume"]["box"][:3]) + tileset["root"].get(
+            "transform", [0] * 16)[12:15]
+        assert 90 < Transformer.from_crs(4978, 4979, always_xy=True).transform(*centre)[2] < 100
         assert list((root / "3dtiles").rglob("*.pnts"))
 
         image = io.BytesIO()
