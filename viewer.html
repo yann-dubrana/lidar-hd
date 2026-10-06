@@ -173,8 +173,9 @@ const deckgl = new DECK.DeckGL({
 });
 
 // Elevation ramp: blue -> green -> yellow -> white, by height.
-function rampColor(z) {
-  const t = Math.max(0, Math.min(1, (z - state.zMin) / Math.max(1, state.zMax - state.zMin)));
+const HEIGHT_RAMP_M = 40;    // top of the ramp for height above ground
+function rampColor(z, lo = state.zMin, hi = state.zMax) {
+  const t = Math.max(0, Math.min(1, (z - lo) / Math.max(1, hi - lo)));
   // Deep blue (low ground) -> teal -> green -> amber -> white (rooftops).
   // Weighted toward the lower half, where most points sit.
   const stops = [
@@ -222,6 +223,10 @@ function readBatchProperty(content, name, count) {
 
   const offset = (bin.byteOffset || 0) + (prop.byteOffset || 0);
   try {
+    // A typed array view must start on a multiple of its element size.
+    if (offset % Type.BYTES_PER_ELEMENT) {
+      return new Type(bin.buffer.slice(offset, offset + count * Type.BYTES_PER_ELEMENT));
+    }
     return new Type(bin.buffer, offset, count);
   } catch (e) {
     return null;                    // misaligned or short buffer: skip colour
@@ -288,6 +293,9 @@ function recolor(tile) {
   // exposes that table as raw bytes (batchTableBinary) plus its JSON layout,
   // and does not decode binary properties itself, so slice it out here.
   const cls = readBatchProperty(c, "classification", n);
+  // Centimetres above ground, written by the colourise stage. Unlike z it
+  // does not depend on the tile's origin, so coarse tiles do not band.
+  const height = state.mode === "elev" ? readBatchProperty(c, "height", n) : null;
 
   // Tile positions are relative to the tile's own origin.
   const zBase = (c.cartographicOrigin && c.cartographicOrigin[2]) || 0;
@@ -303,6 +311,8 @@ function recolor(tile) {
     let col;
     if (state.mode === "class") {
       col = (cls && lut[cls[i]]) || [130, 136, 144];
+    } else if (height) {
+      col = rampColor(height[i] / 100, 0, HEIGHT_RAMP_M);
     } else {
       col = rampColor(pos[i * 3 + 2] + zBase);   // absolute height, as sampled
     }

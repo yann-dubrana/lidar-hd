@@ -19,26 +19,22 @@ class Response(io.BytesIO):
 
 class BrowseTests(unittest.TestCase):
     @patch("lidar_hd.areas.get_json")
-    def test_browse_all_levels_and_pagination(self, get_json):
+    def test_browse_all_levels(self, get_json):
         for level in ("region", "departement"):
             with self.subTest(level=level):
                 get_json.reset_mock()
-                get_json.side_effect = [
-                    {"numberMatched": 3, "features": [
-                        {"properties": {"nom_officiel": "Zulu", "code_insee": "3"}},
-                        {"properties": {"nom_officiel": "alpha", "code_insee": "1"}},
-                    ]},
-                    {"numberMatched": 3, "features": [
-                        {"properties": {"nom_officiel": "Beta", "code_insee": "2"}},
-                    ]},
-                ]
+                get_json.return_value = {"features": [
+                    {"properties": {"nom_officiel": "Zulu", "code_insee": "3"}},
+                    {"properties": {"nom_officiel": "alpha", "code_insee": "1"}},
+                    {"properties": {"nom_officiel": "Beta", "code_insee": "2"}},
+                ]}
                 result = areas.browse(level)
                 self.assertEqual([a.name for a in result], ["alpha", "Beta", "Zulu"])
                 self.assertTrue(all(a.level == level for a in result))
                 queries = [parse_qs(urlparse(c.args[0]).query) for c in get_json.call_args_list]
                 self.assertEqual(queries[0]["PROPERTYNAME"], ["nom_officiel,code_insee"])
                 self.assertNotIn("CQL_FILTER", queries[0])
-                self.assertEqual(queries[1]["STARTINDEX"], ["2"])
+                self.assertEqual(len(queries), 1)
 
     @patch("lidar_hd.areas.get_json")
     def test_no_bulk_communes(self, get_json):
@@ -68,13 +64,12 @@ class DownloadTests(unittest.TestCase):
     @patch("lidar_hd.http.urllib.request.urlopen")
     def test_cumulative_throttled_and_chunks(self, urlopen, clock):
         urlopen.return_value = Response(b"abcdef", 6)
-        events, chunks = [], []
+        events = []
         count = http.download("https://example.test/tile", self.dest, 6, 1, 2,
-                              chunks.append, on_progress=lambda n, t: events.append((n, t)))
+                              on_progress=lambda n, t: events.append((n, t)))
         self.assertEqual(count, 6)
         self.assertEqual(self.dest.read_bytes(), b"abcdef")
         self.assertEqual(events, [(0, 6), (6, 6)])
-        self.assertEqual(chunks, [2, 2, 2])
         self.assertFalse(self.dest.with_suffix(".laz.part").exists())
 
     @patch("lidar_hd.http.time.monotonic", side_effect=[0, .11, .22, .33])
@@ -108,6 +103,62 @@ class DownloadTests(unittest.TestCase):
                       on_progress=lambda n, t: events.append((n, t)))
         self.assertEqual(events, [(0, 4), (2, 4), (0, 4), (4, 4)])
         self.assertEqual(self.dest.read_bytes(), b"abcd")
+
+    @patch("lidar_hd.http.time.sleep")
+    @patch("lidar_hd.http.urllib.request.urlopen")
+    def test_head_size_waits_out_throttling(self, urlopen, sleep):
+        throttled = http.urllib.error.HTTPError("u", 429, "Too Many", {"Retry-After": "3"}, None)
+        urlopen.side_effect = [throttled, throttled, throttled, Response(b"", 7)]
+        self.assertEqual(http.head_size("https://example.test/tile"), 7)
+        sleep.assert_called_with(3)
+        for code in (400, 404):                     # wrong block, unknown path
+            urlopen.side_effect = http.urllib.error.HTTPError("u", code, "No", {}, None)
+            self.assertIsNone(http.head_size("https://example.test/tile"))
+        urlopen.side_effect = http.urllib.error.HTTPError("u", 503, "Down", {}, None)
+        with self.assertRaises(http.HttpError):
+            http.head_size("https://example.test/tile")
+
+    @patch("lidar_hd.http.time.monotonic", return_value=0)
+    @patch("lidar_hd.http.urllib.request.urlopen")
+    def test_retry_resumes_with_range(self, urlopen, clock):
+        class Broken(Response):
+            def read(self, n=-1):
+                data = super().read(n)
+                if not data:
+                    raise OSError("connection reset")
+                return data
+
+        rest = Response(b"cdef", 4)
+        rest.status = 206
+        rest.headers["Content-Range"] = "bytes 2-5/6"
+        urlopen.side_effect = [Broken(b"ab", 6), rest]
+        events, reasons = [], []
+        with patch("lidar_hd.http.time.sleep"):
+            http.download("https://example.test/tile", self.dest, expected=6,
+                          on_progress=lambda n, t: events.append((n, t)), on_retry=reasons.append)
+        self.assertEqual(self.dest.read_bytes(), b"abcdef")
+        self.assertEqual(urlopen.call_args.args[0].get_header("Range"), "bytes=2-")
+        self.assertEqual(events, [(0, 6), (2, 6), (6, 6)])      # never back to zero
+        self.assertEqual(reasons, ["connection reset"])
+
+    @patch("lidar_hd.http.urllib.request.urlopen")
+    def test_stop_cancels_and_removes_partial_file(self, urlopen):
+        urlopen.return_value = Response(b"abcdef", 6)
+        with self.assertRaises(InterruptedError):
+            http.download("https://example.test/tile", self.dest, expected=6, chunk=2,
+                          should_stop=Mock(side_effect=[False, True]))
+        self.assertFalse(self.dest.exists())
+        self.assertFalse(self.dest.with_suffix(".laz.part").exists())
+
+    @patch("lidar_hd.http.time.sleep")
+    @patch("lidar_hd.http.time.monotonic", side_effect=[0, 16, 0, 16])
+    @patch("lidar_hd.http.urllib.request.urlopen")
+    def test_slow_connection_restarts_without_backoff(self, urlopen, clock, sleep):
+        urlopen.side_effect = [Response(b"ab", 2), Response(b"ab", 2)]
+        http.download("https://example.test/tile", self.dest, expected=2, retries=2)
+        self.assertEqual(urlopen.call_count, 2)     # last attempt accepts any speed
+        sleep.assert_not_called()
+        self.assertEqual(self.dest.read_bytes(), b"ab")
 
     @patch("lidar_hd.http.time.sleep")
     @patch("lidar_hd.http.urllib.request.urlopen", side_effect=OSError("offline"))
@@ -144,9 +195,10 @@ class PipelineTests(unittest.TestCase):
         catalog.resolve.side_effect = resolve
         catalog.url.side_effect = lambda tile, block: tile
 
-        def fetch(url, dest, expected=None, *, on_progress=None):
+        def fetch(url, dest, expected=None, *, on_progress=None, on_retry=None, should_stop=None):
             on_progress(0, expected)
             if url == "broken":
+                on_retry("slow connection")
                 raise http.HttpError("offline")
             on_progress(3, expected)
             return 3
@@ -157,12 +209,30 @@ class PipelineTests(unittest.TestCase):
             lambda *args: stage.append(args), lambda: False,
             transfer_progress=lambda *args: transfer.append(args))
         self.assertEqual((result.ok, result.skipped, result.bytes_moved), (1, 2, 3))
-        self.assertEqual(result.failed, ["missing", "broken"])
+        self.assertEqual(sorted(result.failed), ["broken", "missing"])
         self.assertIn(("present", 3, 3), transfer)
         self.assertIn(("unknown", 4, 4), transfer)
         self.assertIn(("new", 0, 3), transfer)
         self.assertIn(("new", 3, 3), transfer)
-        self.assertEqual([c.args[0] for c in download.call_args_list], ["new", "broken"])
+        self.assertEqual(sorted(c.args[0] for c in download.call_args_list), ["broken", "new"])
+        self.assertIn("broken retry: slow connection", [args[3] for args in stage])
+
+    @patch("lidar_hd.pipeline.download", return_value=3)
+    def test_interrupt_cancels_queued_and_running_tiles(self, download):
+        catalog = Mock()
+        catalog.resolve.side_effect = [{"block": "b", "bytes": 3}] * 20 + [KeyboardInterrupt()]
+        with self.assertRaises(KeyboardInterrupt):
+            pipeline.download_tiles([f"t{i}" for i in range(30)], self.dest, catalog)
+        self.assertLessEqual(download.call_count, 20)
+        self.assertTrue(all(c.kwargs["should_stop"]() for c in download.call_args_list))
+
+    def test_probe_failure_is_not_a_missing_tile(self):
+        catalog = Mock()
+        catalog.resolve.side_effect = http.HttpError("HEAD failed")
+        stage = []
+        result = pipeline.download_tiles(["tile"], self.dest, catalog, lambda *args: stage.append(args))
+        self.assertEqual(result.failed, ["tile"])
+        self.assertIn("FAILED", stage[-1][3])
 
     def test_stop_and_empty(self):
         for tiles in ([], ["tile"]):

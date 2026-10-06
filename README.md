@@ -22,18 +22,20 @@ anything is downloaded. **Clear selection** empties the queue.
 
 The roomier split-pane TUI keeps **Run** and **Stop** visible. **Ctrl+F** or
 **/** focuses search, **Tab** changes controls, **Ctrl+R** starts the batch,
-**Escape** requests a stop, and **Ctrl+Q** quits. Stop waits for the current
-tile or conversion. Narrow terminals use a vertically scrollable layout.
+**Escape** requests a stop, and **Ctrl+Q** quits. Stop cancels downloads at
+once and removes their partial files; a running conversion finishes first.
+Narrow terminals use a vertically scrollable layout.
 
 Overall progress weights each enabled stage and area equally, **not by time**.
-The download bar tracks the current file's bytes and transfer speed, resets on
-retry, and shows an indeterminate bar if its size is unknown. Failed and stopped
+The download pane shows the transfers in flight, tiles done, bytes received,
+the speed over the last 5 seconds, and how many slow or failed connections were
+restarted. Its bar is the download stage and only moves forward. Failed and stopped
 runs are labelled explicitly; a finished bar does not imply every file succeeded.
 
 ```
 Bordeaux (33063) · 50 km²
 73 tiles ≈ 8.2 GB raw (±8%)
-+ colourised 12.3 GB + 3D Tiles 28.0 GB = 48.6 GB if all stages run
++ colourised 13.6 GB + 3D Tiles 31.0 GB = 52.9 GB if all stages run
 ~0.3 h download · ~1.0 h processing
 ```
 
@@ -205,6 +207,24 @@ on that release; ordinary branch pushes and manual runs do not publish.
 
 Same code as the TUI, useful for scripting and for long unattended runs.
 
+## Enriched point clouds
+
+Convert your own `.las` / `.laz`, alone or set into the LiDAR HD around it. In
+the TUI, use the fields under the list of places (path, perimeter in metres,
+optional EPSG); a path there replaces the area selection. On the command line:
+
+    python main.py --file site.las --buffer 200 --color   # file + 200 m of LiDAR HD
+    python main.py --file indoor.las                      # file alone (interior scan)
+    python main.py --file site.las --buffer 200 --srs 3945
+
+The file is reprojected to Lambert-93 and LiDAR HD tiles are cropped to the
+perimeter, then both go through one conversion into `site-<name>/3dtiles/`.
+The CRS is read from the file, else guessed from the coordinates (Lambert-93 or
+Lambert CC42–CC50); the detected centre is shown so you can check it. Files
+without RGB are shaded by intensity. Heights are not converted: the file is
+assumed to share LiDAR HD's IGN69 altitudes. LiDAR HD points under the file's
+footprint are kept, so the two clouds overlap there.
+
 ## Separate outputs or a named merged zone
 
 Leave **Merge selection** unchecked to keep one output per selected area.
@@ -231,6 +251,16 @@ levels in the TUI; named fusion removes overlapping tile coverage.
 Names, SIREN codes and contours come from the public
 [API Découpage administratif](https://geo.api.gouv.fr/decoupage-administratif/epcis).
 Contours are reprojected from WGS84 to Lambert-93 before finding LiDAR tiles.
+
+## Upload uses the `mc` client when it is there
+
+Upload runs `mc mirror --overwrite` when MinIO's `mc` is found: on `PATH`
+first, then inside WSL (`mc` on its `PATH`, or `~/aistor-binaries/mc`). It
+sends many objects at once, which is what a tileset of thousands of small
+files needs. No alias is required: the `.env` credentials are handed to `mc`
+through the environment for that run only. Without `mc`, or when the mirror
+fails, objects are sent one by one as before, skipping those already there.
+Nothing is ever deleted from the bucket.
 
 ## Optional complete-tileset MinIO TAR
 
@@ -275,7 +305,7 @@ directory entries, so tile URLs and the tileset tree remain unchanged.
 | Stage | Output | Notes |
 |---|---|---|
 | download | `<data>/<level>-<code>/raw/*.copc.laz` | resumable, skips complete files |
-| colourise | `.../colorized/*.laz` | IGN BD ORTHO at 20 cm/px, +49% size |
+| colourise | `.../colorized/*.laz` | IGN BD ORTHO at 20 cm/px on what the photo can see, class colour below it; adds `height`; +65% size |
 | ortho | `.../ortho/orthophoto.pmtiles` | raster basemap from the same cached 20 cm source |
 | convert | `.../3dtiles/` | one tileset over the whole area |
 | upload | `<bucket>/<prefix>/<level>-<code>/<output>/` | keeps `3dtiles/`, `raw/` or `colorized/`, and `ortho/` separate |
@@ -366,9 +396,12 @@ tile traversal from it, so a backgrounded tab silently loads nothing.
 
 ## Design notes
 
-**Everything network-facing is sequential.** IGN rate-limits concurrent
-requests: parallel batches come back empty or 403, which looks like corruption
-rather than throttling. Do not add a thread pool to the download loop.
+**Tile downloads run 8 in parallel and drop slow connections.** Some
+connections to data.geopf.fr are served at ~0.25 MB/s for their whole life; a
+transfer under 512 kB/s for 15 s is restarted and resumes with a Range request
+from the bytes already on disk. 16 connections added HTTP 429 for
+no extra throughput. Catalogue, WFS and WMS requests stay sequential.
+The knobs are `DOWNLOAD_*` in `lidar_hd/config.py`.
 
 **Block resolution is footprint-filtered.** A tile lives in exactly one of ~223
 delivery blocks and its name does not say which. Probing blindly took 25 s per
@@ -385,17 +418,38 @@ terrain). Exact sizes are only known once each tile is resolved, which is why
 the estimate is instant.
 
 **Source tiles are LAS point format 6**, which has no RGB fields. Colour means
-rewriting every point into format 7, hence the +49%.
+rewriting every point into format 7, hence most of the +65%.
+
+**The orthophoto only colours what it can see.** It is nadir, so it shows the
+top of each spot. A point more than 1 m below the highest classified return of
+its 0.5 m cell (a wall, the ground under a canopy or a bridge) takes its class
+colour shaded by intensity instead of the roof or the leaves above. Foliage
+under foliage keeps the photo; unclassified returns (wires, cars) neither hide
+anything nor get hidden. Artefact points (class 65) are dropped. Tune with
+`OCCLUSION_CELL_M`, `OCCLUSION_DZ_M` and `CLASS_COLORS` in `lidar_hd/config.py`.
+
+**Each colourised point carries `height`**, centimetres above the lowest ground
+return of its 5 m cell (`GROUND_CELL_M`), as a 16-bit extra dimension. It lands
+in the `.pnts` batch table beside `classification`, and the viewer's Elevation
+mode uses it when present.
+
+**Colourised tiles are versioned.** Each one's header names the algorithm
+(`COLOR_VERSION`); a tile from an older one is recoloured on the next run when
+its raw file is still there. `height` reaches the tileset only when every
+input of the conversion is such a tile.
 
 **Conversion is one py3dtiles call for the whole area.** Converting per-tile
 would give unrelated tilesets whose LODs disagree at the seams.
 
 ## Known limits
 
-- The orthophoto is nadir, so building facades inherit roof-edge colour and look
-  streaky. Classification colouring in the viewer avoids this.
-- Elevation colouring bands on coarse LOD tiles: they span ~1 m of local z while
-  their origins differ by tens of metres, so each renders flat. Clears on zoom.
+- Walls and ground under trees are a flat class colour, not their real one:
+  the nadir orthophoto never saw them.
+- `height` steps on slopes: the ground is one value per 5 m cell, so ground
+  points read up to slope × 5 m high.
+- Without `height` (tiles converted uncoloured), Elevation colouring bands on
+  coarse LOD tiles: they span ~1 m of local z while their origins differ by
+  tens of metres, so each renders flat. Clears on zoom.
 - Detail changes in the viewer only take effect once the camera moves — the
   tileset re-runs traversal on viewport change.
 - A region-scale job is days of wall time. Estimate first.
@@ -407,7 +461,7 @@ would give unrelated tilesets whose LODs disagree at the seams.
     viewer.html        deck.gl Tile3DLayer viewer
     lidar_hd/
       config.py        endpoints, measured constants, MinIO settings
-      http.py          sequential GET/HEAD/download with retries
+      http.py          GET/HEAD/download with retries and stall detection
       areas.py         admin area search, tile grid
       catalog.py       delivery blocks, tile -> block resolution + cache
       pipeline.py      download / colourise / convert / upload

@@ -66,6 +66,10 @@ def run() -> None:
 
         image = io.BytesIO()
         Image.new("RGB", (32, 32), (180, 70, 30)).save(image, format="JPEG")
+        # Colourise pulls in rasterio.fill, which the other stages do not.
+        (root / "ortho.jpg").write_bytes(image.getvalue())
+        with patch.object(ortho, "get_ortho", return_value=root / "ortho.jpg"):
+            assert pipeline.colorize_tile(source, root / "colour.laz", ortho_cache=root) == 32
         with patch.object(ortho, "ORTHO_PX", 32), \
                 patch.object(ortho, "get_bytes", return_value=image.getvalue()):
             archive = ortho.export_pmtiles([(420, 6440)], root, lambda *args: None, lambda: False)

@@ -50,7 +50,7 @@ class Catalog:
 
     # --- block list --------------------------------------------------------
 
-    def fetch_blocks(self, progress=None) -> list[str]:
+    def fetch_blocks(self) -> list[str]:
         """Read every delivery block, with its footprint, from the Atom feed."""
         if self.blocks:
             return self.blocks
@@ -77,25 +77,20 @@ class Catalog:
                     if lons and lats:
                         self.footprints[name] = (min(lons), min(lats),
                                                  max(lons), max(lats))
-            if progress:
-                progress(page, pages)
 
         self.blocks = names
         self._order = names[:]
         return names
 
-    def prioritise(self, bbox_l93: tuple[float, float, float, float]) -> int:
+    def prioritise(self, bbox_l93: tuple[float, float, float, float]) -> None:
         """Order blocks by whether their footprint covers a Lambert-93 bbox.
 
         Turns tile resolution from "probe up to 223 blocks" into "probe the
-        handful that actually cover this area". Returns how many matched.
+        handful that actually cover this area".
         """
         if not self.footprints:
-            return 0
-        try:
-            from pyproj import Transformer
-        except ImportError:
-            return 0
+            return
+        from pyproj import Transformer
 
         to_wgs = Transformer.from_crs(2154, 4326, always_xy=True)
         minx, miny, maxx, maxy = bbox_l93
@@ -111,7 +106,6 @@ class Catalog:
         hits = [b for b in self.blocks if overlaps(self.footprints.get(b, (0, 0, 0, 0)))]
         rest = [b for b in self.blocks if b not in set(hits)]
         self._order = hits + rest
-        return len(hits)
 
     # --- tile resolution ---------------------------------------------------
 
@@ -121,14 +115,15 @@ class Catalog:
     def resolve(self, tile: str) -> dict | None:
         """Find which block holds `tile`, returning {'block', 'bytes'}.
 
-        Returns None if no block has it (outside LiDAR HD coverage).
+        Returns None if no block has it (outside LiDAR HD coverage). Raises
+        HttpError when a probe fails for another reason, so the walk stops
+        instead of trying every remaining block against a server that is down.
         """
         hit = self.resolved.get(tile)
         if hit:
             return hit
 
-        if not self.blocks:
-            self.fetch_blocks()
+        self.fetch_blocks()
 
         for block in list(self._order):
             size = head_size(self.url(tile, block))

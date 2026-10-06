@@ -18,14 +18,12 @@ def application_root() -> Path:
     return Path(__file__).resolve().parent.parent
 
 
-try:
-    from dotenv import load_dotenv
-    if getattr(sys, "frozen", False):
-        load_dotenv(application_root() / ".env", override=False)
-    else:
-        load_dotenv()
-except ImportError:                     # python-dotenv is optional
-    pass
+from dotenv import load_dotenv                              # noqa: E402
+
+if getattr(sys, "frozen", False):
+    load_dotenv(application_root() / ".env", override=False)
+else:
+    load_dotenv()
 
 # --- IGN endpoints ---------------------------------------------------------
 
@@ -40,10 +38,19 @@ USER_AGENT = "Mozilla/5.0"          # data.geopf.fr rejects requests without one
 LAMBERT93 = 2154
 ECEF = 4978                         # what 3D Tiles viewers expect
 
-# IGN rate-limits parallel requests: batches come back empty or 403. Every
-# network loop in this package is deliberately sequential.
+# Catalogue/WFS/WMS loops stay sequential. Tile downloads run in parallel:
+# against data.geopf.fr, 8 connections ran without errors and 16 added HTTP 429
+# for no extra throughput. Throughput looks capped per IP, so a second
+# downloader on the same line takes its share. Tune these to the line.
 HTTP_TIMEOUT = 60
 HTTP_RETRIES = 4
+DOWNLOAD_WORKERS = 8
+DOWNLOAD_RETRIES = 10
+# Some download connections are served at ~0.25 MB/s for their whole life while
+# others run at ~20 MB/s. A transfer below DOWNLOAD_MIN_SPEED (bytes/s) for
+# DOWNLOAD_STALL_SECONDS is dropped and restarted.
+DOWNLOAD_MIN_SPEED = 512_000
+DOWNLOAD_STALL_SECONDS = 15
 
 # --- measured constants ----------------------------------------------------
 
@@ -51,13 +58,32 @@ HTTP_RETRIES = 4
 # size estimates, which are explicitly approximate (~8% spread).
 MEAN_TILE_BYTES = 115.7 * 1024 * 1024
 
-# Colourising rewrites LAS point format 6 (no RGB) to format 7 (with RGB).
-COLORIZE_GROWTH = 1.49
+# Colourising rewrites LAS point format 6 (no RGB) to format 7 (with RGB) and
+# adds a 16-bit height. 1.49 measured for RGB alone; the height field added 11%
+# on one urban Bordeaux tile (1.66 -> 1.84), applied here to the mean.
+COLORIZE_GROWTH = 1.65
 # 3D Tiles output measured at ~2.3x the colourised .laz size.
 TILES3D_GROWTH = 2.28
 
-TILE_KM = 1                          # LiDAR HD tiles are 1 km squares
 ORTHO_PX = 5000                      # 1 km / 5000 px = 20 cm, native BD ORTHO
+
+# --- colourise tuning --------------------------------------------------------
+
+# Bump when colourised output changes: colorized/.version older than this is redone.
+COLOR_VERSION = 2
+# The orthophoto only shows the top of each cell. Points more than
+# OCCLUSION_DZ_M below it (walls, ground under a canopy) get their class colour.
+OCCLUSION_CELL_M = 0.5
+OCCLUSION_DZ_M = 1.0
+# Ground model for the per-point height: lowest ground return per cell.
+GROUND_CELL_M = 5.0
+# Colour of a hidden point, by class. CLASSES in viewer.html, except buildings:
+# a wall in the photo view wants stone, not the map's red.
+CLASS_COLORS = {
+    1: (150, 150, 150), 2: (139, 119, 101), 3: (120, 160, 80), 4: (70, 140, 60),
+    5: (35, 105, 45), 6: (196, 186, 170), 9: (70, 130, 180), 17: (176, 160, 112),
+}
+CLASS_COLOR_OTHER = (130, 136, 144)
 
 
 @dataclass(frozen=True)

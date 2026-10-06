@@ -79,18 +79,9 @@ def get_ortho(tx: int, ty: int, cache: Path) -> Path:
             pass
     data = get_bytes(url, timeout=300)
     _validate_image(io.BytesIO(data))
-    with tempfile.NamedTemporaryFile(dir=cache, suffix=".part", delete=False) as fh:
-        part = Path(fh.name)
-        try:
-            fh.write(data)
-        except BaseException:
-            fh.close()
-            part.unlink(missing_ok=True)
-            raise
-    try:
-        part.replace(dest)
-    finally:
-        part.unlink(missing_ok=True)
+    part = dest.with_name(dest.name + ".part")
+    part.write_bytes(data)
+    part.replace(dest)
     return dest
 
 

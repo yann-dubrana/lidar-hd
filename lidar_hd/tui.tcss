@@ -39,6 +39,13 @@ DataTable > .datatable--odd-row { background: #282a37; }
 #batch-options { height: auto; margin-bottom: 1; }
 #zone-name { background: $background; border: tall #55596f; }
 #zone-name:focus { border: tall $primary; }
+#site-options { height: auto; margin-top: 1; }
+#site-row { height: 3; }
+#site-buffer { width: 1fr; }
+#site-srs { width: 1fr; margin-left: 1; }
+#site-options Input { background: $background; border: tall #55596f; }
+#site-options Input:focus { border: tall $primary; }
+#site-note { height: auto; min-height: 2; }
 #output-note { height: auto; margin: 1 0; }
 #opts { height: auto; margin: 1 0; }
 Checkbox { background: transparent; border: none; padding: 0; margin-bottom: 1; }
@@ -63,7 +70,7 @@ Screen.narrow #navigation { width: 1fr; height: 9; margin: 0 0 1 0; }
 Screen.narrow #level { layout: horizontal; }
 Screen.narrow RadioButton { padding: 0 1; }
 Screen.narrow #source-note, Screen.narrow #key-guide { display: none; }
-Screen.narrow #browser { width: 1fr; height: 20; margin: 0 0 1 0; }
+Screen.narrow #browser { width: 1fr; height: 28; margin: 0 0 1 0; }
 Screen.narrow #details { width: 1fr; height: 32; }
 Screen.narrow #progress-row { layout: vertical; height: 18; }
 Screen.narrow #overall-pane { width: 1fr; height: 9; margin: 0 0 1 0; }

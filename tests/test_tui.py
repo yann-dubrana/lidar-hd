@@ -32,13 +32,11 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
 
     def test_text_selection_uses_framework_method(self):
         app = LidarApp()
-        app.selected = REGIONS[0]
         with patch.object(App, "clear_selection") as clear_text, \
                 patch.object(app, "query_one") as query:
             app.clear_selection()
         clear_text.assert_called_once_with()
         query.assert_not_called()
-        self.assertEqual(app.selected, REGIONS[0])
 
     async def test_input_cursor_preserves_area_preview_and_queue(self):
         app = LidarApp()
@@ -51,16 +49,11 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
             app.query_one("#results", DataTable).focus()
             await pilot.press("space")
             await self.ready(app, pilot)
-            self.assertEqual(app.selected, REGIONS[0])
-            selected, tiles, estimate = app.selected, app.tiles, app.est
             summary = str(app.query_one("#summary", Static).content)
             prepared = app._prepared.copy()
             term.focus()
             await pilot.press("home", "shift+right", "end")
             self.assertEqual(term.cursor_position, len(term.value))
-            self.assertEqual(app.selected, selected)
-            self.assertEqual(app.tiles, tiles)
-            self.assertIs(app.est, estimate)
             self.assertEqual(str(app.query_one("#summary", Static).content), summary)
             self.assertEqual(app._prepared, prepared)
             self.assertEqual(list(app._selection), [("region", "53")])
@@ -112,13 +105,22 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
             app._batch_total = 2
             app.begin_area(0, REGIONS[0])
             app.update_progress("download", 0, 2, "Resolving")
-            app.update_transfer("tile.laz", 50, 100)
-            self.assertEqual(app.query_one("#download-progress", ProgressBar).percentage, 0.5)
-            self.assertAlmostEqual(app.query_one("#overall-progress", ProgressBar).progress, 6.25)
+            bar = app.query_one("#download-progress", ProgressBar)
+            label = lambda name: str(app.query_one(name, Static).render())    # noqa: E731
             app.update_transfer("tile.laz", 0, 100)
-            self.assertEqual(app.query_one("#download-progress", ProgressBar).progress, 0)
+            app.update_transfer("tile.laz", 50, 100)
+            self.assertEqual(bar.percentage, 0.25)      # half of one tile out of two
+            self.assertAlmostEqual(app.query_one("#overall-progress", ProgressBar).progress, 6.25)
+            self.assertEqual(label("#download-label"), "1 transfer · 0/2 tiles")
+            self.assertIn("50.0 B received", label("#download-detail"))
             app.update_transfer("unknown.laz", 50, None)
-            self.assertIsNone(app.query_one("#download-progress", ProgressBar).total)
+            self.assertEqual(bar.total, 100)
+            app.update_progress("download", 0, 2, "tile.laz retry: slow connection at 50 bytes")
+            self.assertIn("1 slow or failed connection(s) restarted", label("#download-detail"))
+            app.update_transfer("tile.laz", 100, 100)
+            app.update_progress("download", 1, 2, "tile.laz 100.0 B")
+            self.assertEqual(bar.percentage, 0.5)       # finishing a tile never moves the bar back
+            self.assertEqual(label("#download-label"), "1 transfer · 1/2 tiles")
             app._run_lock.set()
             app.action_stop()
             app._finish()

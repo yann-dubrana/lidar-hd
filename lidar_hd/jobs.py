@@ -4,14 +4,15 @@ from __future__ import annotations
 import json
 import re
 import unicodedata
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Callable
 
-from . import areas, pipeline
+from . import areas, pipeline, site
 from .areas import Area
 from .catalog import Catalog
 from .config import minio_config
+from .site import Site
 
 
 @dataclass(frozen=True)
@@ -67,6 +68,23 @@ def prepare_batch(batch: list[tuple[Area, list[tuple[int, int]]]],
     return [(NamedZone(merge_name.strip(), code, members), tiles)]
 
 
+def plan_site(source: str | Path, buffer: float | None = None,
+              epsg: int | None = None) -> tuple[Site, list[tuple[int, int]]]:
+    """Describe an enriched file and the LiDAR HD tiles within `buffer` metres.
+
+    `buffer=None` means the file alone (an interior scan, say): no tiles.
+    """
+    source = Path(str(source).strip().strip('"'))        # Windows "Copy as path" quotes
+    if not source.is_file():
+        raise ValueError(f"File not found: {source}")
+    if buffer is not None and buffer < 0:
+        raise ValueError("The perimeter must be zero or more metres.")
+    epsg, bbox, centre = site.inspect(source, epsg)
+    clip = None if buffer is None else site.perimeter(bbox, buffer)
+    tiles = areas.tiles_for(site.rectangle(clip)) if clip else []
+    return Site(source.stem, zone_code(source.stem), source, epsg, bbox, centre, clip), tiles
+
+
 def _bind_zone(root: Path, area: NamedZone, tiles: list[tuple[int, int]]) -> None:
     """Refuse stale outputs when a named zone is reused for another selection."""
     manifest = {"name": area.name, "members": [[a.level, a.code] for a in area.members],
@@ -84,16 +102,32 @@ def _bind_zone(root: Path, area: NamedZone, tiles: list[tuple[int, int]]) -> Non
     partial.replace(path)
 
 
-def run_area(area: Area | NamedZone, tiles: list[tuple[int, int]], base: Path, catalog: Catalog,
+def run_area(area: Area | NamedZone | Site, tiles: list[tuple[int, int]], base: Path, catalog: Catalog,
              options: Options, progress: pipeline.Progress = pipeline._noop,
              should_stop: Callable[[], bool] = lambda: False,
              transfer_progress=None) -> dict[str, pipeline.StageResult]:
     """Run selected stages sequentially, reusing on-disk inputs when unchecked."""
     root = base / f"{area.level}-{area.code}"
+    enriched = area if isinstance(area, Site) else None
+    if enriched:
+        # Convert and cleanup delete directories under root.
+        if root.resolve() in enriched.source.resolve().parents:
+            raise ValueError(f"Move {enriched.source.name} out of {root}: that directory holds generated output.")
+        # Same-named files from different folders would overwrite each other.
+        owner, origin = root / "site.json", str(enriched.source.resolve())
+        if owner.exists() and json.loads(owner.read_text(encoding="utf-8")) != origin:
+            raise ValueError(f"site-{enriched.code}/ already holds another file of that name. Rename this one.")
+        if options.stages and not should_stop():
+            root.mkdir(parents=True, exist_ok=True)
+            owner.write_text(json.dumps(origin), encoding="utf-8")
+        # The tileset is the point of an enriched file, whatever is ticked.
+        options = replace(options, convert=True)
+        if not tiles:
+            options = replace(options, download=False, colorize=False, ortho=False)
     if isinstance(area, NamedZone) and options.stages and not should_stop():
         _bind_zone(root, area, tiles)
     raw, col, tiles3d = root / "raw", root / "colorized", root / "3dtiles"
-    names = areas.tile_names(tiles)
+    names = [areas.tile_name(tx, ty) for tx, ty in tiles]
     results = {}
     source = col if not options.colorize and not any(raw.glob("*.copc.laz")) else raw
 
@@ -126,6 +160,13 @@ def run_area(area: Area | NamedZone, tiles: list[tuple[int, int]], base: Path, c
             result = pipeline.StageResult(ok=1, bytes_moved=archive.stat().st_size)
         elif stage == "convert":
             inputs = sorted(source.glob("*.laz"))
+            if enriched:
+                if enriched.clip:
+                    progress(stage, 0, 1, f"Cropping {len(inputs)} tiles to the perimeter")
+                    inputs = site.clip_tiles(inputs, root / "clipped", enriched.clip)
+                progress(stage, 0, 1, f"Reprojecting {enriched.source.name}")
+                inputs.append(site.prepare(enriched.source, root / "enriched" / f"{enriched.code}.las",
+                                           enriched.epsg, enriched.bbox))
             if not inputs:
                 raise ValueError("Convert needs raw or colourised LiDAR files. Enable Download first.")
             result = pipeline.convert_3dtiles(inputs, tiles3d, progress=progress)
@@ -134,9 +175,7 @@ def run_area(area: Area | NamedZone, tiles: list[tuple[int, int]], base: Path, c
             if not cfg.configured:
                 raise ValueError("Upload needs MinIO credentials in .env.")
             target = tiles3d if pipeline.tileset_ok(tiles3d) else source
-            targets = [target] if target.exists() and any(target.rglob("*.laz")) else []
-            if target == tiles3d:
-                targets = [target]
+            targets = [target] if target == tiles3d or any(target.rglob("*.laz")) else []
             if (root / "ortho" / "orthophoto.pmtiles").is_file():
                 targets.append(root / "ortho")
             if not targets:

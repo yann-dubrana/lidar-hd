@@ -45,6 +45,9 @@ class SnowballTests(unittest.TestCase):
         constructor = patch("minio.Minio", return_value=self.client)
         constructor.start()
         self.addCleanup(constructor.stop)
+        # Never the mc client really installed on the machine running the tests.
+        self.mc = patch("lidar_hd.pipeline._mc_command", return_value=None).start()
+        self.addCleanup(self.mc.stop)
 
     def stat(self, bucket, key):
         if key not in self.remote:
@@ -99,6 +102,32 @@ class SnowballTests(unittest.TestCase):
         self.assertCountEqual(self.normal, [("area/tileset.json", "application/json"),
                                             ("area/ortho.pmtiles", "application/vnd.pmtiles")])
         self.client.upload_snowball_objects.assert_not_called()
+
+    def mirror(self, lines, code=0):
+        self.mc.return_value = ["mc"]
+        process = Mock(stdout=iter(lines), wait=Mock(return_value=code), returncode=code)
+        self.file("tileset.json", b"{}")
+        self.file("r.pnts", b"points")
+        with patch("lidar_hd.pipeline.subprocess.run", return_value=Mock(returncode=0)), \
+                patch("lidar_hd.pipeline.subprocess.Popen", return_value=process) as popen:
+            return self.run_upload("/area/"), popen
+
+    def test_mc_client_mirrors_with_credentials_out_of_the_command(self):
+        result, popen = self.mirror(['{"status":"success","source":"./r.pnts","size":6}\n',
+                                     '{"status":"success","total":6,"transferred":6}\n'])
+        self.assertEqual((result.ok, result.skipped, result.bytes_moved), (1, 1, 6))
+        self.assertEqual(self.normal, [])
+        command = popen.call_args.args[0]
+        self.assertEqual(command[-2:], ["./", "lidarhd/bucket/area/"])
+        self.assertNotIn(self.cfg.secret_key, " ".join(command))
+        environment = popen.call_args.kwargs["env"]
+        self.assertIn(self.cfg.secret_key, environment["MC_HOST_lidarhd"])
+        self.assertIn("MC_HOST_lidarhd", environment["WSLENV"])
+
+    def test_failed_mirror_falls_back_to_individual_upload(self):
+        result, _ = self.mirror(['{"status":"error","error":{"message":"denied"}}\n'], code=1)
+        self.assertEqual(result.ok, 2)
+        self.assertEqual(len(self.normal), 2)
 
     def test_real_tar_preserves_tree_prefix_unicode_and_empty_files(self):
         content = {"3dtiles/tileset.json": b"{}", "3dtiles/nested/r.pnts": b"points",

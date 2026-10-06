@@ -47,14 +47,12 @@ class FullTilesetTests(unittest.TestCase):
             self.file("points/kept/r.pnts")
             (self.root / "points/unused/child").mkdir(parents=True)
             return Mock(returncode=0)
-        with patch.object(pipeline, "py3dtiles_exe", return_value="py3dtiles"), \
-                patch.object(pipeline.subprocess, "run", side_effect=convert):
+        with patch.object(pipeline.subprocess, "run", side_effect=convert):
             result = pipeline.convert_3dtiles([self.root / "input.laz"], self.root)
         self.assertEqual(result.ok, 1)
         self.assertFalse((self.root / "points/unused").exists())
         self.assertTrue((self.root / "points/kept/r.pnts").is_file())
-        with patch.object(pipeline, "py3dtiles_exe", return_value="py3dtiles"), \
-                patch.object(pipeline.subprocess, "run", return_value=Mock(returncode=1, stderr="failed")), \
+        with patch.object(pipeline.subprocess, "run", return_value=Mock(returncode=1, stderr="failed")), \
                 patch.object(pipeline, "prune_empty_points") as prune:
             result = pipeline.convert_3dtiles([self.root / "input.laz"], self.root)
         self.assertEqual(result.failed, ["failed"])

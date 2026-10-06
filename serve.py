@@ -14,16 +14,6 @@ import re
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
-TYPES = {
-    ".pnts": "application/octet-stream",
-    ".b3dm": "application/octet-stream",
-    ".cmpt": "application/octet-stream",
-    ".glb": "model/gltf-binary",
-    ".json": "application/json",
-    ".laz": "application/octet-stream",
-    ".copc": "application/octet-stream",
-}
-
 
 class Handler(SimpleHTTPRequestHandler):
     def end_headers(self):
@@ -34,10 +24,6 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header("Accept-Ranges", "bytes")
         self.send_header("Cache-Control", "no-store")
         super().end_headers()
-
-    def guess_type(self, path):
-        ext = os.path.splitext(path)[1].lower()
-        return TYPES.get(ext) or super().guess_type(path)
 
     def do_OPTIONS(self):
         self.send_response(204)

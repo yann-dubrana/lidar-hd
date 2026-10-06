@@ -9,7 +9,7 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 from math import ceil, isfinite
-from typing import Iterable, Literal
+from typing import Literal
 from urllib.parse import urlencode
 
 from .http import get_json, wfs_url
@@ -92,25 +92,11 @@ def browse(level: Level) -> list[Area]:
     if level not in LEVELS:
         raise ValueError(f"unknown administrative level: {level}")
 
-    count = 1000
-    url = wfs_url(level, count=count, properties="nom_officiel,code_insee")
-    areas = []
-    offset = 0
-    while True:
-        data = get_json(f"{url}&STARTINDEX={offset}&SORTBY=nom_officiel,code_insee")
-        features = data.get("features") or []
-        if not features:
-            break
-        for feat in features:
-            p = feat["properties"]
-            areas.append(Area(level, p.get("nom_officiel", "?"), p.get("code_insee", "?")))
-        offset += len(features)
-        matched = data.get("numberMatched")
-        if matched is not None and str(matched).isdigit():
-            if offset >= int(matched):
-                break
-        elif len(features) < count:
-            break
+    # ponytail: one page. 18 regions and 101 departments fit COUNT=1000;
+    # paginate with STARTINDEX if a browsable level ever outgrows it.
+    data = get_json(wfs_url(level, count=1000, properties="nom_officiel,code_insee"))
+    areas = [Area(level, f["properties"].get("nom_officiel", "?"), f["properties"].get("code_insee", "?"))
+             for f in data.get("features") or []]
     areas.sort(key=lambda a: (a.name.casefold(), a.code))
     return areas
 
@@ -295,7 +281,3 @@ def tiles_for(geom: dict) -> list[tuple[int, int]]:
 def tile_name(tx: int, ty: int) -> str:
     """The IGN filename for a tile, e.g. LHD_FXX_0404_6420_PTS_LAMB93_IGN69."""
     return f"LHD_FXX_{tx:04d}_{ty:04d}_PTS_LAMB93_IGN69.copc.laz"
-
-
-def tile_names(tiles: Iterable[tuple[int, int]]) -> list[str]:
-    return [tile_name(tx, ty) for tx, ty in tiles]

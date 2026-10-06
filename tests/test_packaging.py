@@ -38,10 +38,8 @@ class PackagingTests(unittest.TestCase):
     def test_frozen_conversion_relaunches_bundled_worker(self):
         with patch.object(sys, "frozen", True, create=True), \
                 patch.object(sys, "executable", "portable-lidar.exe"), \
-                patch("lidar_hd.pipeline.py3dtiles_exe") as external, \
                 patch("lidar_hd.pipeline.subprocess.run", return_value=Mock(returncode=0)) as run:
             result = pipeline.convert_3dtiles([Path("input.laz")], self.root / "output", jobs=1)
-        external.assert_not_called()
         self.assertEqual(run.call_args.args[0][:2],
                          ["portable-lidar.exe", "--internal-py3dtiles"])
         self.assertEqual(Path(run.call_args.args[0][2]).name, "arguments.json")
@@ -49,7 +47,6 @@ class PackagingTests(unittest.TestCase):
 
     def test_source_conversion_keeps_existing_entry_point(self):
         with patch.object(sys, "frozen", False, create=True), \
-                patch("lidar_hd.pipeline.py3dtiles_exe", return_value=Path("py3dtiles.exe")), \
                 patch("lidar_hd.pipeline.subprocess.run", return_value=Mock(returncode=0)) as run:
             pipeline.convert_3dtiles([Path("input.laz")], self.root / "output")
         self.assertEqual(run.call_args.args[0][:3],

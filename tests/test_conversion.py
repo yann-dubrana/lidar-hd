@@ -51,7 +51,6 @@ class ConversionTests(unittest.TestCase):
             def launch(cmd, **kwargs):
                 manifests.append(Path(cmd[-1]))
                 args = json.loads(manifests[-1].read_text(encoding="utf-8"))
-                self.assertNotIn("--extra-fields", args)
                 self.assertNotIn("--jobs", args)
                 if isinstance(failure, Exception):
                     raise failure
@@ -60,9 +59,9 @@ class ConversionTests(unittest.TestCase):
             with patch.object(pipeline.subprocess, "run", side_effect=launch):
                 if isinstance(failure, Exception):
                     with self.assertRaisesRegex(OSError, "launch failed"):
-                        pipeline.convert_3dtiles([source], self.root / "out", keep_classification=False)
+                        pipeline.convert_3dtiles([source], self.root / "out")
                 else:
-                    result = pipeline.convert_3dtiles([source], self.root / "out", keep_classification=False)
+                    result = pipeline.convert_3dtiles([source], self.root / "out")
                     self.assertEqual(result.failed, ["conversion failed"])
             self.assertFalse(manifests[0].parent.exists())
             self.assertEqual(source.read_bytes(), b"keep")

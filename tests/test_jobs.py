@@ -57,6 +57,24 @@ class JobTests(unittest.TestCase):
         self.assertEqual(upload.call_args.args[1], "lidar-hd/commune-12345/ortho")
         self.assertEqual(result["upload"].ok, 2)
 
+    @patch("lidar_hd.site.prepare", side_effect=lambda source, dst, epsg, bbox: dst)
+    @patch("lidar_hd.pipeline.convert_3dtiles", return_value=pipeline.StageResult(ok=1))
+    def test_enriched_file_alone_always_converts(self, convert, prepare):
+        source = self.base / "in" / "Scan.las"
+        source.parent.mkdir()
+        source.write_bytes(b"las")
+        found = jobs.Site("Scan", "scan", source, 3945, (0, 0, 1, 1), (0, 0))
+        jobs.run_area(found, [], self.base, self.catalog, jobs.Options(cleanup=False))
+        self.assertEqual(convert.call_args.args[0], [self.base / "site-scan" / "enriched" / "scan.las"])
+        self.catalog.fetch_blocks.assert_not_called()
+
+        other = self.base / "elsewhere" / "Scan.las"
+        other.parent.mkdir()
+        other.write_bytes(b"las")
+        with self.assertRaisesRegex(ValueError, "Rename"):
+            jobs.run_area(jobs.Site("Scan", "scan", other, 3945, (0, 0, 1, 1), (0, 0)), [], self.base,
+                          self.catalog, jobs.Options(cleanup=False))
+
     @patch("lidar_hd.pipeline.download_tiles", return_value=pipeline.StageResult(ok=1))
     def test_download_passes_transfer_callback(self, download):
         transfer = Mock()

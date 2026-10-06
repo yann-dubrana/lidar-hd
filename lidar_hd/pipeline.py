@@ -12,16 +12,18 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor, wait
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Iterable
 
 from .catalog import Catalog
-from .cleanup import prune_empty_points
-from .config import (COLORIZE_GROWTH, ECEF, LAMBERT93, MEAN_TILE_BYTES,
-                     ORTHO_LAYER, ORTHO_PX, TILES3D_GROWTH, WMS)
-from .http import HttpError, download, get_bytes
+from .config import (CLASS_COLOR_OTHER, CLASS_COLORS, COLOR_VERSION, COLORIZE_GROWTH,
+                     DOWNLOAD_WORKERS, ECEF, GROUND_CELL_M, LAMBERT93, MEAN_TILE_BYTES,
+                     OCCLUSION_CELL_M, OCCLUSION_DZ_M, TILES3D_GROWTH)
+from .http import HttpError, download
 
 Progress = Callable[[str, int, int, str], None]   # stage, done, total, detail
 
@@ -45,8 +47,9 @@ class Estimate:
 
     @property
     def download_hours(self) -> float:
-        # ~16 s/tile observed sequentially against data.geopf.fr.
-        return self.tiles * 16 / 3600
+        # 14-46 MB/s observed with DOWNLOAD_WORKERS connections to data.geopf.fr,
+        # depending on the hour; 20 MB/s is the planning figure.
+        return self.raw_bytes / 20e6 / 3600
 
     @property
     def process_hours(self) -> float:
@@ -65,7 +68,6 @@ def human(n: float) -> str:
         if abs(n) < 1024 or unit == "TB":
             return f"{n:,.1f} {unit}".replace(",", " ")
         n /= 1024
-    return f"{n:.1f} TB"
 
 
 # --- stage 1: download -----------------------------------------------------
@@ -86,61 +88,95 @@ def download_tiles(tiles: list[str], dest: Path, catalog: Catalog,
                    ) -> StageResult:
     """Download tiles into `dest`, skipping any already present at full size.
 
-    Sequential by design: IGN rate-limits concurrent requests.
-    `transfer_progress(tile, received, total)` reports per-attempt byte counts;
-    present files report their actual size as both received and total.
+    Tiles are resolved in order on the calling thread and fetched by
+    DOWNLOAD_WORKERS threads, so `progress` and `transfer_progress` are called
+    from several threads. `transfer_progress(tile, received, total)` reports
+    per-attempt byte counts; present files report their actual size as both
+    received and total. A slow or failed attempt reports
+    `progress("download", done, total, "<tile> retry: <reason>")` without
+    advancing `done`. A stop cancels the transfers in flight and removes their
+    partial files. A tile whose size probe fails is reported FAILED, not missing.
     """
     dest.mkdir(parents=True, exist_ok=True)
     res = StageResult()
     t0 = time.time()
     progress("download", 0, len(tiles), "Resolving tiles")
+    lock = threading.Lock()
+    cancelled = threading.Event()
+    done = 0
 
-    for i, tile in enumerate(tiles, 1):
-        if should_stop():
-            break
-        out = dest / tile
-        entry = catalog.resolve(tile)
+    def stopping() -> bool:
+        return cancelled.is_set() or should_stop()
 
-        if entry is None:                       # outside LiDAR HD coverage
-            res.failed.append(tile)
-            progress("download", i, len(tiles), f"{tile} not available")
-            continue
+    def finish(detail: str) -> None:
+        nonlocal done
+        with lock:
+            done += 1
+            progress("download", done, len(tiles), detail)
 
-        want = entry.get("bytes") or 0
-        if out.exists() and (out.stat().st_size == want or not want):
-            res.skipped += 1
-            if transfer_progress:
-                size = out.stat().st_size
-                transfer_progress(tile, size, size)
-            progress("download", i, len(tiles), f"{tile} present")
-            continue
+    def fetch(tile: str, url: str, out: Path, want: int) -> None:
+        def retrying(reason: str) -> None:
+            with lock:
+                progress("download", done, len(tiles), f"{tile} retry: {reason}")
 
         try:
-            kwargs = {}
-            if transfer_progress:
-                kwargs["on_progress"] = lambda received, total, tile=tile: transfer_progress(
-                    tile, received, total)
-            n = download(catalog.url(tile, entry["block"]), out, expected=want or None, **kwargs)
-            res.ok += 1
-            res.bytes_moved += n
-            progress("download", i, len(tiles), f"{tile} {human(n)}")
-        except HttpError as e:
-            res.failed.append(tile)
-            progress("download", i, len(tiles), f"{tile} FAILED {e}")
+            n = download(url, out, expected=want or None, on_retry=retrying, should_stop=stopping,
+                         on_progress=transfer_progress and (
+                             lambda received, total: transfer_progress(tile, received, total)))
+            with lock:
+                res.ok += 1
+                res.bytes_moved += n
+            finish(f"{tile} {human(n)}")
+        except InterruptedError:
+            pass
+        except Exception as e:                      # noqa: BLE001 - nobody reads the future
+            with lock:
+                res.failed.append(tile)
+            finish(f"{tile} FAILED {e}")
+
+    with ThreadPoolExecutor(DOWNLOAD_WORKERS) as pool:
+        pending = []
+        try:
+            for tile in tiles:
+                if should_stop():
+                    break
+                out = dest / tile
+                try:
+                    entry = catalog.resolve(tile)
+                except HttpError as e:                  # probe failed: unknown, not missing
+                    with lock:
+                        res.failed.append(tile)
+                    finish(f"{tile} FAILED {e}")
+                    continue
+
+                if entry is None:                       # outside LiDAR HD coverage
+                    with lock:
+                        res.failed.append(tile)
+                    finish(f"{tile} not available")
+                    continue
+
+                want = entry.get("bytes") or 0
+                if out.exists() and (out.stat().st_size == want or not want):
+                    with lock:
+                        res.skipped += 1
+                    if transfer_progress:
+                        size = out.stat().st_size
+                        transfer_progress(tile, size, size)
+                    finish(f"{tile} present")
+                    continue
+
+                pending.append(pool.submit(fetch, tile, catalog.url(tile, entry["block"]), out, want))
+            wait(pending)
+        except BaseException:                       # Ctrl+C or a crash: do not drain the queue
+            cancelled.set()
+            pool.shutdown(wait=True, cancel_futures=True)
+            raise
 
     res.seconds = time.time() - t0
     return res
 
 
 # --- stage 2: colourise ----------------------------------------------------
-
-def _ortho_url(tx: int, ty: int) -> str:
-    bbox = f"{tx},{ty},{tx + 1000},{ty + 1000}"
-    return (f"{WMS}?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap"
-            f"&LAYERS={ORTHO_LAYER}&CRS=EPSG:{LAMBERT93}"
-            f"&BBOX={bbox}&WIDTH={ORTHO_PX}&HEIGHT={ORTHO_PX}"
-            f"&FORMAT=image/jpeg&STYLES=")
-
 
 # Dimensions copied from LAS point format 6 to format 7 (= 6 + RGB).
 _CARRY = [
@@ -151,64 +187,144 @@ _CARRY = [
 ]
 
 
-def colorize_tile(src: Path, dst: Path, *, ortho_cache: Path | None = None) -> int:
+# Written into each colourised tile's header: a tile from an older algorithm
+# is redone, one from this algorithm carries `height`.
+_COLOR_STAMP = f"lidar-hd colour {COLOR_VERSION}"
+
+
+def _coloured(path: Path) -> bool:
+    """True when `path` is a tile colourised by this version of the algorithm."""
+    import laspy
+
+    try:
+        with laspy.open(str(path)) as reader:
+            return reader.header.generating_software == _COLOR_STAMP
+    except Exception:                         # noqa: BLE001 - missing or unreadable: redo
+        return False
+
+
+_ARTEFACT = 65                  # LiDAR HD class for noise the survey rejected
+_UNCLASSIFIED = 1               # wires, cars: thin things the ground shows through
+_VEGETATION = (3, 4, 5)
+
+
+def _cell_extremes(cell, value, ufunc):
+    """(sorted unique cell ids, ufunc-reduced value per cell).
+
+    Sort + reduceat: ufunc.at is far too slow for the 10M+ points of a tile.
+    """
+    import numpy as np
+
+    order = np.argsort(cell, kind="stable")
+    cells = cell[order]
+    if not len(cells):
+        return cells, value[:0]
+    starts = np.flatnonzero(np.r_[True, cells[1:] != cells[:-1]])
+    return cells[starts], ufunc.reduceat(value[order], starts)
+
+
+def colorize_tile(src: Path, dst: Path, *, ortho_cache: Path) -> int:
     """Drape IGN BD ORTHO onto one tile, rewriting format 6 -> 7.
 
     LiDAR HD tiles have no RGB fields, so colour means rewriting every point
     into a wider format; output is ~50% larger.
+
+    The orthophoto is nadir: it shows only the top of what stands at each spot.
+    Points well below that top (walls, ground under a canopy or a bridge) get
+    their class colour shaded by intensity instead of the roof or the leaves.
+    Each point also gets `height`, centimetres above the tile's ground returns.
     """
     import laspy
     import numpy as np
     from PIL import Image
+
+    from .ortho import get_ortho
     Image.MAX_IMAGE_PIXELS = None       # a 5000x5000 tile trips the bomb guard
 
     las = laspy.read(str(src))
+    las.points = las.points[np.asarray(las.classification) != _ARTEFACT]
     x = np.asarray(las.x, dtype=np.float64)
     y = np.asarray(las.y, dtype=np.float64)
+    z = np.asarray(las.z, dtype=np.float64)
+    cls = np.asarray(las.classification, dtype=np.uint8)
     tx = int(x.min() // 1000) * 1000
     ty = int(y.min() // 1000) * 1000
 
-    if ortho_cache is not None:
-        from .ortho import get_ortho
+    with Image.open(get_ortho(tx, ty, ortho_cache)) as image:
+        arr = np.asarray(image.convert("RGB"))
+    h, w, _ = arr.shape
+    # Image row 0 is the north edge, so y is flipped against Lambert-93.
+    px = np.clip(((x - tx) / 1000 * w).astype(np.int32), 0, w - 1)
+    py = np.clip(((ty + 1000 - y) / 1000 * h).astype(np.int32), 0, h - 1)
+    rgb = arr[py, px].astype(np.uint16)
 
-        ortho = get_ortho(tx, ty, ortho_cache)
-    else:
-        ortho = dst.with_suffix(".ortho.jpg")
-        ortho.write_bytes(get_bytes(_ortho_url(tx, ty), timeout=300))
+    def cells(size: float):
+        cx, cy = ((x - tx) / size).astype(np.int64), ((y - ty) / size).astype(np.int64)
+        shape = int(cy.max()) + 1, int(cx.max()) + 1
+        return cy * shape[1] + cx, shape
 
-    try:
-        with Image.open(ortho) as image:
-            arr = np.asarray(image.convert("RGB"))
-        h, w, _ = arr.shape
-        # Image row 0 is the north edge, so y is flipped against Lambert-93.
-        px = np.clip(((x - tx) / 1000 * w).astype(np.int32), 0, w - 1)
-        py = np.clip(((ty + 1000 - y) / 1000 * h).astype(np.int32), 0, h - 1)
-        rgb = arr[py, px].astype(np.uint16) * 257      # 8-bit -> LAS 16-bit
+    # Top of each cell, ignoring unclassified returns: a power line must not
+    # hide the ground under it.
+    cell, _ = cells(OCCLUSION_CELL_M)
+    solid = cls != _UNCLASSIFIED
+    tops_at, tops = _cell_extremes(cell[solid], z[solid], np.maximum)
+    top = np.full(len(z), -np.inf)
+    if len(tops_at):
+        at = np.minimum(np.searchsorted(tops_at, cell), len(tops_at) - 1)
+        top = np.where(tops_at[at] == cell, tops[at], -np.inf)
+    # Foliage under foliage is still the colour of the photo.
+    hidden = (z < top - OCCLUSION_DZ_M) & ~np.isin(cls, (_UNCLASSIFIED, *_VEGETATION))
+    if hidden.any():
+        palette = np.full((256, 3), CLASS_COLOR_OTHER, dtype=np.float64)
+        for code, colour in CLASS_COLORS.items():
+            palette[code] = colour
+        intensity = np.asarray(las.intensity, dtype=np.float64)
+        peak = np.percentile(intensity, 98) or 1.0
+        shade = 0.6 + 0.4 * np.clip(intensity[hidden] / peak, 0, 1)
+        rgb[hidden] = (palette[cls[hidden]] * shade[:, None]).astype(np.uint16)
 
-        hdr = laspy.LasHeader(version="1.4", point_format=7)
-        hdr.scales = las.header.scales
-        hdr.offsets = las.header.offsets
-        hdr.vlrs.extend([v for v in las.header.vlrs
-                         if v.user_id == "LASF_Projection"])
+    # ponytail: ground is the lowest return per GROUND_CELL_M cell, sampled
+    # nearest, so heights step by slope x cell size. Interpolate if that shows.
+    height = np.zeros(len(z), dtype=np.uint16)
+    ground = cls == 2
+    if ground.any():
+        from rasterio.fill import fillnodata
 
-        out = laspy.LasData(hdr)
-        for dim in _CARRY:
-            try:
-                setattr(out, dim, getattr(las, dim))
-            except Exception:                     # noqa: BLE001 - dim absent
-                pass
-        out.red, out.green, out.blue = rgb[:, 0], rgb[:, 1], rgb[:, 2]
-        out.write(str(dst))
-    finally:
-        if ortho_cache is None:
-            ortho.unlink(missing_ok=True)
+        cell, shape = cells(GROUND_CELL_M)
+        lows_at, lows = _cell_extremes(cell[ground], z[ground], np.minimum)
+        grid = np.zeros(shape, dtype=np.float32)
+        known = np.zeros(shape, dtype=bool)
+        grid.flat[lows_at], known.flat[lows_at] = lows, True
+        grid = fillnodata(grid, mask=known, max_search_distance=max(shape))
+        height = np.clip((z - grid.flat[cell]) * 100, 0, 65535).astype(np.uint16)
 
+    hdr = laspy.LasHeader(version="1.4", point_format=7)
+    hdr.scales = las.header.scales
+    hdr.offsets = las.header.offsets
+    hdr.vlrs.extend([v for v in las.header.vlrs
+                     if v.user_id == "LASF_Projection"])
+    hdr.add_extra_dim(laspy.ExtraBytesParams("height", np.uint16))
+    hdr.generating_software = _COLOR_STAMP
+
+    out = laspy.LasData(hdr)
+    for dim in _CARRY:
+        try:
+            setattr(out, dim, getattr(las, dim))
+        except Exception:                     # noqa: BLE001 - dim absent
+            pass
+    rgb *= 257                                # 8-bit -> LAS 16-bit
+    out.red, out.green, out.blue = rgb[:, 0], rgb[:, 1], rgb[:, 2]
+    out.height = height
+    # The header alone says a tile is done, so never leave half a file under dst.
+    part = dst.with_name(dst.name + ".part")
+    out.write(str(part), do_compress=dst.suffix == ".laz")
+    part.replace(dst)
     return len(las.points)
 
 
 def colorize_all(src_dir: Path, dst_dir: Path, progress: Progress = _noop,
                  should_stop: Callable[[], bool] = lambda: False, *,
-                 ortho_cache: Path | None = None) -> StageResult:
+                 ortho_cache: Path) -> StageResult:
     dst_dir.mkdir(parents=True, exist_ok=True)
     tiles = sorted(src_dir.glob("*.copc.laz"))
     res = StageResult()
@@ -218,7 +334,7 @@ def colorize_all(src_dir: Path, dst_dir: Path, progress: Progress = _noop,
         if should_stop():
             break
         dst = dst_dir / src.name.replace(".copc.laz", ".laz")
-        if dst.exists() and dst.stat().st_size > 0:
+        if _coloured(dst):
             res.skipped += 1
             progress("colorize", i, len(tiles), f"{src.name} present")
             continue
@@ -237,33 +353,8 @@ def colorize_all(src_dir: Path, dst_dir: Path, progress: Progress = _noop,
 
 # --- stage 3: 3D Tiles -----------------------------------------------------
 
-def py3dtiles_exe() -> Path:
-    """Locate the py3dtiles entry point.
-
-    In a venv sys.executable already lives in Scripts/ (or bin/), while for a
-    system Python the scripts sit in a sibling Scripts/ directory. Check both,
-    then fall back to PATH.
-    """
-    exe = "py3dtiles.exe" if os.name == "nt" else "py3dtiles"
-    here = Path(sys.executable).parent
-    for candidate in (here / exe,                       # venv layout
-                      here / "Scripts" / exe,           # system Python, Windows
-                      here / "bin" / exe):              # system Python, POSIX
-        if candidate.exists():
-            return candidate
-
-    found = shutil.which("py3dtiles")
-    if found:
-        return Path(found)
-
-    raise FileNotFoundError(
-        "py3dtiles not found. Install it into the environment running this "
-        "app: pip install py3dtiles (or `uv add py3dtiles`)."
-    )
-
-
 def convert_3dtiles(inputs: Iterable[Path], out_dir: Path,
-                    jobs: int = 0, keep_classification: bool = True,
+                    jobs: int = 0,
                     progress: Progress = _noop) -> StageResult:
     """Convert every input into ONE tileset.
 
@@ -283,10 +374,12 @@ def convert_3dtiles(inputs: Iterable[Path], out_dir: Path,
 
     arguments = ["convert", *[str(p.resolve()) for p in inputs],
                  "--out", str(out_dir.resolve()),
-                 "--srs_in", str(LAMBERT93), "--srs_out", str(ECEF)]
-    if keep_classification:
-        # Lands in the .pnts batch table, which the viewer decodes.
-        arguments += ["--extra-fields", "classification"]
+                 "--srs_in", str(LAMBERT93), "--srs_out", str(ECEF),
+                 # Lands in the .pnts batch table, which the viewer decodes.
+                 "--extra-fields", "classification"]
+    # Only when every input has it: py3dtiles would give the others height 0.
+    if all(_coloured(p) for p in inputs):
+        arguments += ["--extra-fields", "height"]
     if jobs:
         arguments += ["--jobs", str(jobs)]
 
@@ -347,6 +440,14 @@ def upload_dir(local: Path, prefix: str, cfg, progress: Progress = _noop,
         res.seconds = time.time() - t0
         return res
 
+    # The mc client sends in parallel; one object at a time is the fallback,
+    # and picks up whatever a failed mirror left behind.
+    mc = _mc_command()
+    if mc and _upload_mc(mc, local, prefix, cfg, len(files), res, progress, should_stop):
+        res.seconds = time.time() - t0
+        return res
+    res = StageResult()
+
     for i, path in enumerate(files, 1):
         if should_stop():
             break
@@ -373,6 +474,92 @@ def upload_dir(local: Path, prefix: str, cfg, progress: Progress = _noop,
 
     res.seconds = time.time() - t0
     return res
+
+
+_MC_ALIAS = "lidarhd"           # defined per run through MC_HOST_<alias>, never saved
+
+
+def _mc_command() -> list[str] | None:
+    """How to run the MinIO client: on PATH first, then inside WSL, else None."""
+    candidates = []
+    native = shutil.which("mc")
+    if native:
+        candidates.append([native])
+    wsl = shutil.which("wsl") if sys.platform == "win32" else None
+    if wsl:
+        try:
+            # Not always on PATH there: also look where MinIO's installer puts it.
+            found = subprocess.run([wsl, "-e", "sh", "-c", "command -v mc || ls ~/aistor-binaries/mc"],
+                                   capture_output=True, text=True, timeout=20).stdout.split()
+            if found:
+                candidates.append([wsl, "-e", found[0]])
+        except (OSError, subprocess.SubprocessError):
+            pass
+    for command in candidates:
+        try:
+            # `mc` is also Midnight Commander: only MinIO's answers like this.
+            version = subprocess.run([*command, "--version"], capture_output=True, text=True, timeout=20)
+            if version.returncode == 0 and "mc version" in version.stdout:
+                return command
+        except (OSError, subprocess.SubprocessError):
+            pass
+    return None
+
+
+def _upload_mc(mc: list[str], local: Path, prefix: str, cfg, total: int, res: StageResult,
+               progress: Progress, should_stop: Callable[[], bool]) -> bool:
+    """`mc mirror` the directory; False when the caller should fall back."""
+    from urllib.parse import quote
+
+    scheme = "https" if cfg.secure else "http"
+    host = (f"{scheme}://{quote(cfg.access_key, safe='')}:{quote(cfg.secret_key, safe='')}"
+            f"@{cfg.endpoint}")
+    name = f"MC_HOST_{_MC_ALIAS}"
+    # Credentials travel in the environment, not on the command line. WSLENV
+    # is what lets the variable through to a client running inside WSL.
+    env = {**os.environ, name: host,
+           "WSLENV": ":".join(filter(None, (os.environ.get("WSLENV"), name)))}
+    bucket = f"{_MC_ALIAS}/{cfg.bucket}"
+    run = {"cwd": local, "env": env, "text": True, "encoding": "utf-8", "errors": "replace"}
+    try:
+        # An alias mc does not know is taken for a local folder, and the mirror
+        # would then "succeed" into it: prove the alias reaches the bucket first.
+        if subprocess.run([*mc, "ls", bucket], capture_output=True, timeout=60, **run).returncode:
+            progress("upload", 0, total, "mc cannot reach the bucket - sending one by one")
+            return False
+        progress("upload", 0, total, f"mc mirror -> {cfg.bucket}/{prefix.strip('/')}")
+        proc = subprocess.Popen(
+            [*mc, "mirror", "--json", "--overwrite", "--exclude", "*.part", "--exclude", "*.tmp",
+             "--exclude", "tmp/*", "--exclude", "*/tmp/*", "./", f"{bucket}/{prefix.strip('/')}/"],
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **run)
+    except (OSError, subprocess.SubprocessError) as e:
+        progress("upload", 0, total, f"mc unavailable ({e}) - sending one by one")
+        return False
+
+    error = ""
+    for line in proc.stdout:
+        if should_stop():
+            proc.terminate()
+            break
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if event.get("status") != "success":
+            error = str((event.get("error") or {}).get("message") or line.strip())
+        elif "source" in event:
+            res.ok += 1
+            res.bytes_moved += event.get("size", 0)
+            progress("upload", min(res.ok, total), total,
+                     f"{Path(event['source']).name} {human(event.get('size', 0))}")
+    if proc.wait() or error:
+        if should_stop():
+            return True                           # cancelled: nothing to fall back to
+        progress("upload", res.ok, total, f"mc mirror failed ({error or proc.returncode}) - sending one by one")
+        return False
+    res.skipped = max(total - res.ok, 0)          # mirror only reports what it sent
+    progress("upload", total, total, f"{res.ok} sent, {res.skipped} already there")
+    return True
 
 
 def _upload_snowball_dir(client, bucket: str, local: Path, prefix: str,
@@ -469,6 +656,24 @@ def _upload_snowball_dir(client, bucket: str, local: Path, prefix: str,
 
 # --- cleanup ---------------------------------------------------------------
 
+def prune_empty_points(tileset: Path) -> int:
+    """Remove empty directories under points/, returning how many; files are never deleted.
+
+    rmdir only ever removes an empty directory, and os.walk does not descend
+    into links or junctions. Directories that cannot be removed are skipped.
+    """
+    points = tileset / "points"
+    removed = 0
+    for directory, _, _ in os.walk(points, topdown=False):
+        if Path(directory) != points:
+            try:
+                Path(directory).rmdir()
+                removed += 1
+            except OSError:
+                pass
+    return removed
+
+
 def tileset_ok(tiles3d: Path) -> bool:
     """True when a 3D Tiles directory looks like a finished conversion.
 
@@ -545,7 +750,8 @@ def cleanup(root: Path, *, expected_tiles: int, did_color: bool,
 
     if tiles_done:
         # The tileset supersedes both earlier stages.
-        for stage, path in (("colorized", colorized), ("raw", raw)):
+        for stage, path in (("colorized", colorized), ("raw", raw),
+                            ("clipped", root / "clipped"), ("enriched", root / "enriched")):
             if path.exists():
                 n = remove_tree(path)
                 freed += n
@@ -566,8 +772,6 @@ def cleanup(root: Path, *, expected_tiles: int, did_color: bool,
 def _content_type(path: Path) -> str:
     return {
         ".json": "application/json",
-        ".pnts": "application/octet-stream",
-        ".laz": "application/octet-stream",
         ".pmtiles": "application/vnd.pmtiles",
         ".html": "text/html",
     }.get(path.suffix.lower(), "application/octet-stream")
