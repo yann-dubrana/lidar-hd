@@ -57,6 +57,16 @@ class JobTests(unittest.TestCase):
         self.assertEqual(upload.call_args.args[1], "lidar-hd/commune-12345/ortho")
         self.assertEqual(result["upload"].ok, 2)
 
+    @patch("lidar_hd.jobs.minio_config", return_value=MinioConfig("host", "key", "secret", "bucket"))
+    @patch("lidar_hd.pipeline.upload_dir")
+    def test_upload_never_sends_point_cloud_inputs(self, upload, config):
+        for folder in ("raw", "colorized"):
+            (self.root / folder).mkdir(parents=True)
+            (self.root / folder / "tile.laz").write_bytes(b"points")
+        with self.assertRaisesRegex(ValueError, "No finished 3D tileset"):
+            jobs.run_area(self.area, [(400, 6401)], self.base, self.catalog, self.options(upload=True))
+        upload.assert_not_called()
+
     @patch("lidar_hd.site.prepare", side_effect=lambda source, dst, epsg, bbox, **kw: dst)
     @patch("lidar_hd.pipeline.convert_3dtiles", return_value=pipeline.StageResult(ok=1))
     def test_enriched_file_alone_always_converts(self, convert, prepare):

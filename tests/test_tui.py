@@ -69,6 +69,10 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
             await pilot.press("space", "down", "enter")
             await self.ready(app, pilot)
             self.assertEqual(len(app._prepared), 2)
+            # The second pick ticks Merge, which waits for a zone name.
+            self.assertTrue(app.query_one("#run", Button).disabled)
+            app.query_one("#merge", Checkbox).value = False
+            await pilot.pause()
             self.assertFalse(app.query_one("#run", Button).disabled)
             app.query_one("#term", Input).value = "Bret"
             await pilot.pause(0.5)
@@ -144,6 +148,8 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
                 app.query_one("#results", DataTable).focus()
                 await pilot.press("space", "down", "space")
                 await self.ready(app, pilot)
+                app.query_one("#merge", Checkbox).value = False      # separate outputs stay possible
+                await pilot.pause()
                 app.action_run()
                 app.action_run()
                 await self.ready(app, pilot)
@@ -170,7 +176,8 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
                 app.query_one("#results", DataTable).focus()
                 await pilot.press("space", "down", "space")
                 await self.ready(app, pilot)
-                app.query_one("#merge", Checkbox).value = True
+                self.assertTrue(app.query_one("#merge", Checkbox).value)     # ticked by the second pick
+                self.assertEqual(app.options().stages, ["download", "colorize", "convert", "upload", "cleanup"])
                 await pilot.pause()
                 self.assertTrue(app.query_one("#run", Button).disabled)
                 name = app.query_one("#zone-name", Input)
@@ -234,12 +241,12 @@ class CliTests(unittest.TestCase):
     def test_named_merge(self, run, search, geometry, catalog):
         result = cli(["--level", "region", "--name", "Bretagne", "--name", "Nouvelle",
                       "--merge-name", "La CUB", "--no-download", "--ortho", "--no-clean",
-                      "--upload", "--snowball"])
+                      "--upload"])
         self.assertEqual(result, 0)
         run.assert_called_once()
         self.assertEqual(run.call_args.args[0].code, "la-cub")
         self.assertEqual(len(run.call_args.args[1]), 1)
-        self.assertTrue(run.call_args.args[4].snowball)
+        self.assertTrue(run.call_args.args[4].upload)
 
     @patch("main.Catalog.load")
     @patch("main.areas.geometry", return_value=GEOMETRY)

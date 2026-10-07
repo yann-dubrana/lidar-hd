@@ -10,7 +10,6 @@ import os
 import shutil
 import subprocess
 import sys
-import tarfile
 import tempfile
 import threading
 import time
@@ -443,15 +442,8 @@ def convert_3dtiles(inputs: Iterable[Path], out_dir: Path,
 # --- stage 4: upload -------------------------------------------------------
 
 def upload_dir(local: Path, prefix: str, cfg, progress: Progress = _noop,
-               should_stop: Callable[[], bool] = lambda: False, *,
-               snowball: bool = False) -> StageResult:
-    """Mirror a local directory into a MinIO bucket under `prefix`.
-
-    Snowball sends the complete directory in one disk-staged, streamed TAR,
-    regardless of file size/count. PMTiles remain ordinary range-readable
-    objects. Extraction is verified by size; there is no individual fallback.
-    An entirely present directory is skipped, otherwise the whole TAR is sent.
-    """
+               should_stop: Callable[[], bool] = lambda: False) -> StageResult:
+    """Mirror a local directory into a MinIO bucket under `prefix`."""
     from minio import Minio
 
     if not should_stop() and tileset_ok(local):
@@ -465,12 +457,6 @@ def upload_dir(local: Path, prefix: str, cfg, progress: Progress = _noop,
              and p.suffix not in (".part", ".tmp") and "tmp" not in p.relative_to(local).parts]
     res = StageResult()
     t0 = time.time()
-
-    if snowball:
-        _upload_snowball_dir(client, cfg.bucket, local, prefix, files, res,
-                             progress, should_stop)
-        res.seconds = time.time() - t0
-        return res
 
     # The mc client sends in parallel; one object at a time is the fallback,
     # and picks up whatever a failed mirror left behind.
@@ -592,98 +578,6 @@ def _upload_mc(mc: list[str], local: Path, prefix: str, cfg, total: int, res: St
     res.skipped = max(total - res.ok, 0)          # mirror only reports what it sent
     progress("upload", total, total, f"{res.ok} sent, {res.skipped} already there")
     return True
-
-
-def _upload_snowball_dir(client, bucket: str, local: Path, prefix: str,
-                         files: list[Path], res: StageResult, progress: Progress,
-                         should_stop: Callable[[], bool]) -> None:
-    from .snowball import UploadReader, upload_tar
-
-    prefix = prefix.strip("/")
-    batch: list[tuple[Path, str, int]] = []
-    present_count = 0
-
-    def report(detail: str) -> None:
-        progress("upload", res.ok + res.skipped + len(res.failed), len(files), detail)
-
-    for path in files:
-        if should_stop():
-            return
-        relative = path.relative_to(local).as_posix()
-        key = f"{prefix}/{relative}" if prefix else relative
-        try:
-            size = path.stat().st_size
-            try:
-                present = client.stat_object(bucket, key).size == size
-            except Exception:                     # noqa: BLE001 - not there yet
-                present = False
-            if should_stop():
-                return
-            if path.suffix.lower() == ".pmtiles":
-                if present:
-                    res.skipped += 1
-                else:
-                    client.fput_object(bucket, key, str(path), content_type=_content_type(path))
-                    res.ok += 1
-                    res.bytes_moved += size
-                report(f"{key} {'present' if present else human(size)}")
-                continue
-            batch.append((path, key, size))
-            present_count += int(present)
-        except Exception as e:                    # noqa: BLE001
-            res.failed.append(key)
-            report(f"{key} FAILED {e}")
-            return
-    if not batch or should_stop():
-        return
-    if present_count == len(batch):
-        res.skipped += len(batch)
-        report("Complete tileset already present")
-        return
-    try:
-        with tempfile.TemporaryDirectory(prefix=".snowball-", dir=local) as staging:
-            archive = Path(staging) / "tileset.tar"
-            with tarfile.open(archive, "w", format=tarfile.PAX_FORMAT) as tar:
-                for index, (path, key, size) in enumerate(batch, 1):
-                    if should_stop():
-                        return
-                    report(f"Preparing complete TAR {index}/{len(batch)}: {key}")
-                    with path.open("rb") as data:
-                        if os.fstat(data.fileno()).st_size != size:
-                            raise OSError(f"{key} changed while preparing Snowball TAR")
-                        info = tarfile.TarInfo(key)
-                        info.size = size
-                        tar.addfile(info, UploadReader(data, size, lambda *_: None, should_stop))
-            report("Sending complete TAR (server-side extraction)")
-            upload_tar(client, bucket, archive,
-                       lambda done, total: report(f"TAR upload {human(done)} / {human(total)}"),
-                       should_stop)
-    except InterruptedError:
-        if not should_stop():
-            raise
-        return
-    except Exception as e:                        # noqa: BLE001
-        if should_stop():
-            return
-        for _, key, _ in batch:
-            res.failed.append(key)
-        report(f"Complete TAR FAILED; Snowball upload/extraction required: {e}")
-        return
-    for _, key, size in batch:
-        if should_stop():
-            return
-        try:
-            actual = client.stat_object(bucket, key).size
-            if actual != size:
-                raise ValueError(f"expected {size} bytes, found {actual}")
-        except Exception as e:                    # noqa: BLE001
-            res.failed.append(key)
-            report(f"{key} FAILED Snowball extraction not verified "
-                   f"(server must support auto-extraction): {e}")
-        else:
-            res.ok += 1
-            res.bytes_moved += size
-            report(f"{key} {human(size)} (Snowball verified)")
 
 
 # --- cleanup ---------------------------------------------------------------

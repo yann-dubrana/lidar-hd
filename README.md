@@ -39,7 +39,8 @@ Bordeaux (33063) · 50 km²
 ~0.3 h download · ~1.0 h processing
 ```
 
-Download and safe cleanup are selected by default. **Every stage is a separate
+Download, Colourise, Convert, Upload and safe cleanup are selected by default
+(Upload only when MinIO is configured). **Every stage is a separate
 option**: Download, Colourise, Export ortho PMTiles, Convert, Upload, Cleanup.
 Uncheck Download to test processing against existing files, or to export only
 the orthophoto. Missing inputs produce an actionable error rather than silently
@@ -203,7 +204,7 @@ on that release; ordinary branch pushes and manual runs do not publish.
     python main.py --level commune --name Pessac --no-download --tiles --no-clean
     python main.py --level epci --name "Bordeaux Métropole" --estimate-only
     python main.py --level commune --name Pessac --name Talence --merge-name "La CUB" --color --ortho --tiles --upload
-    python main.py --level epci --name "Bordeaux Métropole" --no-download --upload --snowball --no-clean
+    python main.py --level epci --name "Bordeaux Métropole" --no-download --upload --no-clean
 
 Same code as the TUI, useful for scripting and for long unattended runs.
 
@@ -264,7 +265,8 @@ converted before this change sit about 45 m too low: convert them again.
 
 ## Separate outputs or a named merged zone
 
-Leave **Merge selection** unchecked to keep one output per selected area.
+Selecting a second area ticks **Merge selection**; untick it to keep one output
+per selected area.
 Check it and enter a name such as **La CUB**, or use `--merge-name "La CUB"`,
 to process the union of the selected areas' 1 km tiles. Shared tiles are counted
 and processed only once. With the corresponding stages enabled, this creates
@@ -299,43 +301,10 @@ through the environment for that run only. Without `mc`, or when the mirror
 fails, objects are sent one by one as before, skipping those already there.
 Nothing is ever deleted from the bucket.
 
-## Optional complete-tileset MinIO TAR
-
-Enable **Upload to MinIO** and **Complete tileset TAR**, or use
-`--upload --snowball`. Normal per-file uploads remain the default.
-This uses MinIO's Snowball server-side extraction protocol, **not a ZIP stored
-as an ordinary object**. Archive members carry the full destination keys so
-`tileset.json` and its referenced files remain individually addressable with
-the same directory layout as normal uploads. The TAR object's name is not
-the destination prefix.
-
-Use a MinIO server that supports Snowball extraction; a generic S3-compatible
-endpoint need not support it. Extraction is checked before reporting success.
-If it fails or is unsupported, the run reports errors and keeps local inputs;
-it does not silently switch upload modes or delete remote objects.
-The **entire tileset**, including large tiles and every subdirectory's files,
-is sent in **one uncompressed TAR per output directory**, without the old
-16 MiB cutoff or 128 MiB / 256-file batches. PMTiles remain separate normal
-uploads, so the basemap can still be read using HTTP Range requests.
-The TAR is staged on disk (allow space for a full additional copy) and streamed
-in a single signed PUT with bounded memory, not multipart: MinIO extraction
-does not work with multipart uploads. The SDK's 5 GiB part limit is bypassed;
-actual MinIO server and reverse-proxy body-size/time limits still apply.
-The activity log reports TAR preparation and bytes sent. Cancelling can leave
-partially extracted remote objects; local inputs are retained. The temporary
-local TAR is removed after success, failure or cancellation.
-
-If every destination file already has the expected size, no TAR is sent.
-Otherwise the **whole tileset is resent**, including existing files, to keep
-one complete archive. Extraction is verified by file size, not checksum.
-Per-file MIME metadata is not carried by Snowball; use normal uploads if your
-serving setup requires explicit content types. A speed-up is not guaranteed.
-
 After successful conversion, and before uploading an existing complete tileset,
 empty subdirectories under `points/` are removed locally. Files (including
 zero-byte files), non-empty directories, links and junctions are preserved;
-no remote objects are deleted. TAR archives contain files only, not empty
-directory entries, so tile URLs and the tileset tree remain unchanged.
+no remote objects are deleted, and tile URLs remain unchanged.
 
 ## What each stage does
 
@@ -345,7 +314,7 @@ directory entries, so tile URLs and the tileset tree remain unchanged.
 | colourise | `.../colorized/*.laz` | IGN BD ORTHO at 20 cm/px on what the photo can see, class colour below it; adds `height`; +65% size |
 | ortho | `.../ortho/orthophoto.pmtiles` | raster basemap from the same cached 20 cm source |
 | convert | `.../3dtiles/` | one tileset over the whole area |
-| upload | `<bucket>/<prefix>/<level>-<code>/<output>/` | keeps `3dtiles/`, `raw/` or `colorized/`, and `ortho/` separate |
+| upload | `<bucket>/<prefix>/<level>-<code>/<output>/` | sends `3dtiles/` and `ortho/` only, never `raw/` or `colorized/` |
 
 Data lands under `LIDARHD_DATA`, defaulting to `data/` beside the project when
 running from source, or beside `lidar-hd.exe` in the Windows package.

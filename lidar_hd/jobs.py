@@ -23,7 +23,6 @@ class Options:
     convert: bool = False
     upload: bool = False
     cleanup: bool = True
-    snowball: bool = False
     z_align: bool = False            # enriched file: shift it onto LiDAR HD's altitude
     keep_overlap: bool = False       # enriched file: keep the LiDAR HD points it duplicates
 
@@ -184,12 +183,12 @@ def run_area(area: Area | NamedZone | Site, tiles: list[tuple[int, int]], base: 
             cfg = minio_config()
             if not cfg.configured:
                 raise ValueError("Upload needs MinIO credentials in .env.")
-            target = tiles3d if pipeline.tileset_ok(tiles3d) else source
-            targets = [target] if target == tiles3d or any(target.rglob("*.laz")) else []
+            # Deliverables only: raw/ and colorized/ are never sent.
+            targets = [tiles3d] if pipeline.tileset_ok(tiles3d) else []
             if (root / "ortho" / "orthophoto.pmtiles").is_file():
                 targets.append(root / "ortho")
             if not targets:
-                raise ValueError("No completed outputs to upload. Run an export or download first.")
+                raise ValueError("No finished 3D tileset to upload. Enable Convert to 3D Tiles.")
             result = pipeline.StageResult()
             for index, folder in enumerate(targets):
                 if should_stop():
@@ -201,8 +200,7 @@ def run_area(area: Area | NamedZone | Site, tiles: list[tuple[int, int]], base: 
 
                 prefix = "/".join(part for part in (cfg.prefix.strip("/"),
                                                   f"{area.level}-{area.code}", folder.name) if part)
-                item = pipeline.upload_dir(folder, prefix, cfg, upload_progress, should_stop,
-                                           snowball=options.snowball)
+                item = pipeline.upload_dir(folder, prefix, cfg, upload_progress, should_stop)
                 result.ok += item.ok
                 result.skipped += item.skipped
                 result.failed.extend(item.failed)

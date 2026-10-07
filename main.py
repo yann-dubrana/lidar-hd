@@ -129,12 +129,10 @@ class LidarApp(App):
                         yield Static("Unchecked stages reuse existing files.", classes="dim")
                         with Vertical(id="opts"):
                             yield Checkbox("Download LiDAR", id="do_download", value=True)
-                            yield Checkbox("Colourise (20 cm ortho)", id="do_color")
+                            yield Checkbox("Colourise (20 cm ortho)", id="do_color", value=True)
                             yield Checkbox("Export ortho PMTiles", id="do_ortho")
-                            yield Checkbox("Convert to 3D Tiles", id="do_tiles")
-                            yield Checkbox("Upload to MinIO", id="do_upload")
-                            yield Checkbox("Complete tileset TAR", id="do_snowball", disabled=True,
-                                           tooltip="One streamed TAR including large tiles; extracted by MinIO. PMTiles stay separate.")
+                            yield Checkbox("Convert to 3D Tiles", id="do_tiles", value=True)
+                            yield Checkbox("Upload to MinIO", id="do_upload", value=True)
                             yield Checkbox("Clean intermediates", id="do_clean", value=True)
                         yield Static("", id="upload-note", classes="dim")
                     with Horizontal(id="actions"):
@@ -165,6 +163,7 @@ class LidarApp(App):
 
         cfg = minio_config()
         if not cfg.configured:
+            self.query_one("#do_upload", Checkbox).value = False
             self.query_one("#do_upload", Checkbox).disabled = True
             self.query_one("#upload-note", Static).update("Upload unavailable: configure MinIO in .env.")
         self.log_line(f"Data directory: {data_root()}")
@@ -204,8 +203,6 @@ class LidarApp(App):
             " · ".join(a.name for a in self._selection.values()) or "Selections stay while you search.")
         merging = self.query_one("#merge", Checkbox).value
         self.query_one("#zone-name", Input).disabled = not merging
-        upload = self.query_one("#do_upload", Checkbox)
-        self.query_one("#do_snowball", Checkbox).disabled = not upload.value or upload.disabled
         valid = True
         note = "Separate outputs for each area."
         if merging:
@@ -256,6 +253,7 @@ class LidarApp(App):
             self._selection.clear()
             self._prepared.clear()
             self._estimate_requests.clear()
+            self.query_one("#merge", Checkbox).value = False
             self.clear_selection(area_preview=True)
 
     @on(Checkbox.Changed)
@@ -267,8 +265,7 @@ class LidarApp(App):
         return jobs.Options(**{stage: self.query_one(f"#do_{suffix}", Checkbox).value
                                for stage, suffix in (("download", "download"), ("colorize", "color"),
                                                      ("ortho", "ortho"), ("convert", "tiles"),
-                                                     ("upload", "upload"), ("cleanup", "clean"),
-                                                     ("snowball", "snowball"))},
+                                                     ("upload", "upload"), ("cleanup", "clean"))},
                             z_align=self.query_one("#z-align", Checkbox).value,
                             keep_overlap=self.query_one("#keep-overlap", Checkbox).value)
 
@@ -358,9 +355,13 @@ class LidarApp(App):
                 self._selection.pop(key)
                 self._prepared.pop(key, None)
                 self._estimate_requests.pop(key, None)
+                if len(self._selection) < 2:
+                    self.query_one("#merge", Checkbox).value = False
                 self.clear_selection(area_preview=True)
                 return
             self._selection[key] = area
+            if len(self._selection) == 2:           # on the second pick only: unticking it sticks
+                self.query_one("#merge", Checkbox).value = True
             self._estimate_generation += 1
             self._estimate_requests[key] = self._estimate_generation
             self.refresh_selection()
@@ -611,12 +612,9 @@ def cli(argv: list[str] | None = None) -> int:
     ap.add_argument("--no-download", action="store_true", help="reuse local inputs instead of downloading LiDAR")
     ap.add_argument("--tiles", action="store_true", help="convert to 3D Tiles")
     ap.add_argument("--upload", action="store_true", help="upload to MinIO")
-    ap.add_argument("--snowball", action="store_true", help="send the complete tileset in one server-extracted TAR, including large files (MinIO only)")
     ap.add_argument("--no-clean", action="store_true",
                     help="keep raw/ and colorized/ after a successful run")
     args = ap.parse_args(argv)
-    if args.snowball and not args.upload:
-        ap.error("--snowball requires --upload")
     if args.merge_name is not None:
         try:
             jobs.zone_code(args.merge_name)
@@ -632,7 +630,7 @@ def cli(argv: list[str] | None = None) -> int:
     catalog = Catalog.load(data_root() / "catalog.json")
     options = jobs.Options(download=not args.no_download, colorize=args.color,
                            ortho=args.ortho, convert=args.tiles or bool(args.file), upload=args.upload,
-                           cleanup=not args.no_clean, snowball=args.snowball,
+                           cleanup=not args.no_clean,
                            z_align=args.z_align, keep_overlap=args.keep_overlap)
 
     def progress(stage: str, done: int, total: int, detail: str) -> None:

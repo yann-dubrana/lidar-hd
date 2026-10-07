@@ -93,7 +93,7 @@ class MergeTests(unittest.TestCase):
         self.assertEqual(ortho.call_args.args[0], tiles)
 
     @patch("lidar_hd.pipeline.upload_dir", return_value=pipeline.StageResult(ok=1))
-    def test_named_upload_prefix_and_snowball_option(self, upload):
+    def test_named_upload_prefix(self, upload):
         area, tiles = jobs.prepare_batch(self.batch, "La CUB")[0]
         with patch("lidar_hd.pipeline.download_tiles", return_value=pipeline.StageResult()):
             jobs.run_area(area, tiles, self.base, Mock(), jobs.Options(cleanup=False))
@@ -103,10 +103,8 @@ class MergeTests(unittest.TestCase):
         cfg = MinioConfig("host", "key", "secret", "bucket", prefix="")
         with patch("lidar_hd.jobs.minio_config", return_value=cfg):
             jobs.run_area(area, tiles, self.base, Mock(),
-                          jobs.Options(download=False, upload=True, snowball=True, cleanup=False))
+                          jobs.Options(download=False, upload=True, cleanup=False))
         self.assertEqual(upload.call_args.args[1], "zone-la-cub/ortho")
-        self.assertTrue(upload.call_args.kwargs["snowball"])
-        self.assertEqual(jobs.Options(download=False, cleanup=False, snowball=True).stages, [])
 
 
 if __name__ == "__main__":
